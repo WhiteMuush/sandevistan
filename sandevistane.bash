@@ -156,6 +156,38 @@ display_menu() {
 }
 
 
+check_and_install_tool() {
+    local tool_name=$1
+    local install_command=$2
+    
+    if ! command -v "$tool_name" &> /dev/null; then
+        echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}$tool_name is not installed.${RESET}"
+        read -rp "Would you like to install it? (yes/no): " install_choice
+        
+        case $install_choice in
+            yes|y|Y|YES)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing $tool_name...\n"
+                eval "$install_command"
+                
+                if command -v "$tool_name" &> /dev/null; then
+                    echo -e "\n${BRIGHT_GREEN}[✓]${RESET} $tool_name installed successfully!\n"
+                    return 0
+                else
+                    echo -e "\n${BRIGHT_RED}[✗]${RESET} Installation failed. Please install manually.\n"
+                    return 1
+                fi
+                ;;
+            *)
+                echo -e "\n${BRIGHT_RED}[!]${RESET} Installation cancelled.\n"
+                return 1
+                ;;
+        esac
+    fi
+    return 0
+}
+
+
+
 
 # Choice 1: Network Reconnaissance
 network_reconnaissance_menu(){
@@ -174,14 +206,19 @@ network_reconnaissance_menu(){
     
     echo -e "        ${BRIGHT_BLUE}┌─                                      ─┐${RESET}"
     echo ""
-    
+
+
     local options=(
-        "1) PROGRAMME 1"
-        "2) PROGRAMME 2"
-        "3) PROGRAMME 3"
-        "4) PROGRAMME 4"
-        "5) PROGRAMME 5"
-        "6) Back to Main Menu"
+        "1) Nmap"
+        "2) Masscan"
+        "3) Recon-ng"
+        "4) Amass"
+        "5) Sublister"
+        "7) TheHarvester"
+        "8) Dirbuster"
+        "9) dnsenum"
+        "10) WhatWeb"
+        "99) Back to Main Menu"
     )
     
     for option in "${options[@]}"; do
@@ -193,43 +230,99 @@ network_reconnaissance_menu(){
     echo ""
     
     while true; do
-            read -rp " ${BRIGHT_BLUE}user@nexus:~${RESET}${BRIGHT_RED}\$${RESET} " sub_choice
+        read -rp " ${BRIGHT_BLUE}user@nexus:~${RESET}${BRIGHT_RED}\$${RESET} " sub_choice
         
         case $sub_choice in
             1)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Executing Ping Sweep...\n"
-                sleep 1
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Nmap...\n"
+                if check_and_install_tool "nmap" "sudo apt-get install -y nmap"; then
+                    read -rp "Enter target (IP/hostname): " target
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Executing Nmap scan...\n"
+                    nmap "$target"
+                fi
                 ;;
             2)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Performing Port Scan...\n"
-                sleep 1
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Masscan...\n"
+                if check_and_install_tool "masscan" "sudo apt-get install -y masscan"; then
+                    read -rp "Enter target (IP/range): " target
+                    read -rp "Enter ports (e.g., 1-1000): " ports
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Performing Masscan...\n"
+                    sudo masscan "$target" -p"$ports" --rate=1000
+                fi
                 ;;
             3)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Starting Service Enumeration...\n"
-                sleep 1
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Recon-ng...\n"
+                if check_and_install_tool "recon-ng" "sudo apt-get install -y recon-ng"; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Starting Recon-ng...\n"
+                    recon-ng
+                fi
                 ;;
             4)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Conducting OS Fingerprinting...\n"
-                sleep 1
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Amass...\n"
+                if check_and_install_tool "amass" "sudo apt-get install -y amass"; then
+                    read -rp "Enter domain: " domain
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running Amass enumeration...\n"
+                    amass enum -d "$domain"
+                fi
                 ;;
             5)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Mapping Vulnerabilities...\n"
-                sleep 1
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Sublist3r...\n"
+                if check_and_install_tool "sublist3r" "sudo apt-get install -y sublist3r"; then
+                    read -rp "Enter domain: " domain
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running Sublist3r...\n"
+                    sublist3r -d "$domain"
+                fi
                 ;;
-            6)
+            7)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking TheHarvester...\n"
+                if check_and_install_tool "theHarvester" "sudo apt-get install -y theharvester"; then
+                    read -rp "Enter domain: " domain
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running TheHarvester...\n"
+                    theHarvester -d "$domain" -b all
+                fi
+                ;;
+            8)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Dirbuster...\n"
+                if check_and_install_tool "dirb" "sudo apt-get install -y dirb"; then
+                    read -rp "Enter URL: " url
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running Dirb...\n"
+                    dirb "$url"
+                fi
+                ;;
+            9)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking dnsenum...\n"
+                if check_and_install_tool "dnsenum" "sudo apt-get install -y dnsenum"; then
+                    read -rp "Enter domain: " domain
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running dnsenum...\n"
+                    dnsenum "$domain"
+                fi
+                ;;
+            10)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking WhatWeb...\n"
+                if check_and_install_tool "whatweb" "sudo apt-get install -y whatweb"; then
+                    read -rp "Enter URL: " url
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running WhatWeb...\n"
+                    whatweb "$url"
+                fi
+                ;;
+            99)
                 echo -e "\n${BRIGHT_RED}[◆]${RESET} Returning to Main Menu...\n"
                 sleep 1
                 clear
                 return
-
                 ;;
             *)
                 echo -e "\n${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Invalid selection${RESET}\n"
                 sleep 1
                 ;;
         esac
+        
+        echo ""
+        read -rp "${BRIGHT_BLUE}Press Enter to continue..."
+        clear
+        display_ascii_info
+        network_reconnaissance_menu
     done
-
 }
 
 
@@ -239,7 +332,7 @@ netword_reconnaissance() {
 
 
 
-#MAIN SELECTIOn HANDLER
+#MAIN SELECTION HANDLER
 
 handle_selection() {
     case $1 in
