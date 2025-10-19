@@ -53,4 +53,4 @@ This tool is intended for educational purposes and authorized security testing o
 https://linktr.ee/melvinpetit
 
 
-### Thanks you ! <3
+### Thank you ! <3
