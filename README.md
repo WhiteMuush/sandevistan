@@ -29,7 +29,28 @@ sudo bash sandevistan.sh
 - **Optimized Performance**: Pre-configured for maximum efficiency
 - **Easy Deployment**: Simple installation and setup process
 
-## Unique interface styles 
+## A Unique Cyberpunk Interface Style
+
+Experience a visually stunning and immersive interface that embodies the essence of cyberpunk aesthetics. Our design combines futuristic elements with a user-friendly layout, ensuring that you not only work efficiently but also enjoy the process. Dive into a world where technology meets art, enhancing your cybersecurity tasks with a unique flair.
+
 
 
 <img width="1676" height="1014" alt="Capture d’écran 2025-10-17 165603" src="https://github.com/user-attachments/assets/64dc5645-27c6-4a96-8e50-752ed2f5b0fd" />
+
+
+## License
+
+This project is licensed under the MIT License. Feel free to use, modify, and distribute it, but please credit the original authors ( Melvin PETIT / WhiteMuush ).
+
+
+## Disclaimer
+
+This tool is intended for educational purposes and authorized security testing only. Use at your own risk. The authors and contributors accept no responsibility or liability for any misuse, damages, data loss, service disruption, or legal consequences resulting from its use. Ensure you have explicit permission and comply with all applicable laws. No warranties, express or implied.
+
+
+## Linktree
+
+https://linktr.ee/melvinpetit
+
+
+### Thanks you ! <3
