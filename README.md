@@ -32,3 +32,4 @@ sudo bash sandevistan.sh
 ## Unique interface styles 
 
 
+<img width="1676" height="1014" alt="Capture d’écran 2025-10-17 165603" src="https://github.com/user-attachments/assets/64dc5645-27c6-4a96-8e50-752ed2f5b0fd" />
