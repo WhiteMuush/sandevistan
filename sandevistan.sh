@@ -308,8 +308,6 @@ network_reconnaissance_menu(){
                 sleep 1
                 clear
                 return
-                display_ascii_info
-                display_menu
                 ;;
             *)
                 echo -e "\n${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Invalid selection${RESET}\n"
@@ -320,8 +318,7 @@ network_reconnaissance_menu(){
         echo ""
         read -rp "${BRIGHT_BLUE}Press Enter to continue..."
         clear
-        display_ascii_info
-        network_reconnaissance_menu
+        return
     done
 }
 
@@ -332,26 +329,30 @@ netword_reconnaissance() {
 
 
 #CHOICE 2: Vulnerability Scanning
-Vulnerability_menu(){
+vulnerability_menu(){
     clear
     display_ascii_info
     echo -e "${BRIGHT_RED}"
     echo ""
     echo ""
     echo "      ╔══════════════════════════════════════════════╗"
-    echo "      ║${RESET}   ${BRIGHT_BLUE}▓▒░  NETWORK RECONNAISSANCE MODULE  ░▒▓${BRIGHT_RED}    ║"
+    echo "      ║${RESET}     ${BRIGHT_BLUE}▓▒░  VULNERABILITY SCANNING  ░▒▓${BRIGHT_RED}       ║"
     echo "      ╚══════════════════════════════════════════════╝"
     echo -e "${RESET}"
     
     echo -e "       System: ${BRIGHT_BLUE}OPERATIONAL${RESET}  ${BRIGHT_RED}✞${RESET}  Security Level: ${BRIGHT_RED}MAXIMUM${RESET}"
     echo ""
-    
     echo -e "        ${BRIGHT_BLUE}┌─                                      ─┐${RESET}"
     echo ""
 
-
     local options=(
-        "1) "
+        "1) Nikto"
+        "2) Nuclei"
+        "3) Wapiti"
+        "4) SQLMap"
+        "5) XSStrike"
+        "6) Commix"
+        "7) WPScan"
         "99) Back to Main Menu"
     )
     
@@ -368,75 +369,104 @@ Vulnerability_menu(){
         
         case $sub_choice in
             1)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Nmap...\n"
-                if check_and_install_tool "nmap" "sudo apt-get install -y nmap"; then
-                    read -rp "Enter target (IP/hostname): " target
-                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Executing Nmap scan...\n"
-                    nmap "$target"
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Nikto...\n"
+                if check_and_install_tool "nikto" "sudo apt-get install -y nikto"; then
+                    read -rp "Enter target URL: " target
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running Nikto web scanner...\n"
+                    nikto -h "$target"
                 fi
                 ;;
             2)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Masscan...\n"
-                if check_and_install_tool "masscan" "sudo apt-get install -y masscan"; then
-                    read -rp "Enter target (IP/range): " target
-                    read -rp "Enter ports (e.g., 1-1000): " ports
-                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Performing Masscan...\n"
-                    sudo masscan "$target" -p"$ports" --rate=1000
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Nuclei...\n"
+                if ! command -v nuclei &> /dev/null; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Nuclei is not installed.${RESET}"
+                    read -rp "Would you like to install it? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing Nuclei from GitHub...\n"
+                        if command -v go &> /dev/null; then
+                            go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+                            export PATH=$PATH:~/go/bin
+                        else
+                            echo -e "${BRIGHT_RED}[!]${RESET} Go is not installed. Installing via apt...\n"
+                            sudo apt-get install -y golang-go
+                            go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+                            export PATH=$PATH:~/go/bin
+                        fi
+                    fi
+                fi
+                if command -v nuclei &> /dev/null || [ -f ~/go/bin/nuclei ]; then
+                    read -rp "Enter target URL: " target
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running Nuclei vulnerability scanner...\n"
+                    ~/go/bin/nuclei -u "$target" -severity critical,high,medium
                 fi
                 ;;
             3)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Recon-ng...\n"
-                if check_and_install_tool "recon-ng" "sudo apt-get install -y recon-ng"; then
-                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Starting Recon-ng...\n"
-                    recon-ng
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Wapiti...\n"
+                if check_and_install_tool "wapiti" "sudo apt-get install -y wapiti"; then
+                    read -rp "Enter target URL: " target
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running Wapiti web application scanner...\n"
+                    wapiti -u "$target"
                 fi
                 ;;
             4)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Amass...\n"
-                if check_and_install_tool "amass" "sudo apt-get install -y amass"; then
-                    read -rp "Enter domain: " domain
-                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running Amass enumeration...\n"
-                    amass enum -d "$domain"
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking SQLMap...\n"
+                if check_and_install_tool "sqlmap" "sudo apt-get install -y sqlmap"; then
+                    read -rp "Enter target URL: " target
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running SQLMap for SQL injection testing...\n"
+                    sqlmap -u "$target" --batch --random-agent
                 fi
                 ;;
             5)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Sublist3r...\n"
-                if check_and_install_tool "sublist3r" "sudo apt-get install -y sublist3r"; then
-                    read -rp "Enter domain: " domain
-                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running Sublist3r...\n"
-                    sublist3r -d "$domain"
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking XSStrike...\n"
+                if [ ! -d ~/tools/XSStrike ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}XSStrike is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning XSStrike from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/s0md3v/XSStrike.git ~/tools/XSStrike
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing dependencies...\n"
+                        pip3 install -r ~/tools/XSStrike/requirements.txt
+                    fi
+                fi
+                if [ -d ~/tools/XSStrike ]; then
+                    read -rp "Enter target URL: " target
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running XSStrike for XSS detection...\n"
+                    python3 ~/tools/XSStrike/xsstrike.py -u "$target"
+                fi
+                ;;
+            6)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Commix...\n"
+                if [ ! -d ~/tools/commix ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Commix is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning Commix from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/commixproject/commix.git ~/tools/commix
+                        chmod +x ~/tools/commix/commix.py
+                    fi
+                fi
+                if [ -d ~/tools/commix ]; then
+                    read -rp "Enter target URL: " target
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running Commix for command injection...\n"
+                    python3 ~/tools/commix/commix.py --url="$target" --batch
                 fi
                 ;;
             7)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking TheHarvester...\n"
-                if check_and_install_tool "theHarvester" "sudo apt-get install -y theharvester"; then
-                    read -rp "Enter domain: " domain
-                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running TheHarvester...\n"
-                    theHarvester -d "$domain" -b all
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking WPScan...\n"
+                if ! command -v wpscan &> /dev/null; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}WPScan is not installed.${RESET}"
+                    read -rp "Would you like to install it? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing WPScan...\n"
+                        sudo gem install wpscan
+                    fi
                 fi
-                ;;
-            8)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Dirbuster...\n"
-                if check_and_install_tool "dirb" "sudo apt-get install -y dirb"; then
-                    read -rp "Enter URL: " url
-                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running Dirb...\n"
-                    dirb "$url"
-                fi
-                ;;
-            9)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking dnsenum...\n"
-                if check_and_install_tool "dnsenum" "sudo apt-get install -y dnsenum"; then
-                    read -rp "Enter domain: " domain
-                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running dnsenum...\n"
-                    dnsenum "$domain"
-                fi
-                ;;
-            10)
-                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking WhatWeb...\n"
-                if check_and_install_tool "whatweb" "sudo apt-get install -y whatweb"; then
-                    read -rp "Enter URL: " url
-                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running WhatWeb...\n"
-                    whatweb "$url"
+                if command -v wpscan &> /dev/null; then
+                    read -rp "Enter WordPress URL: " target
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running WPScan for WordPress vulnerabilities...\n"
+                    wpscan --url "$target" --enumerate vp,vt,u
                 fi
                 ;;
             99)
@@ -444,20 +474,17 @@ Vulnerability_menu(){
                 sleep 1
                 clear
                 return
-                display_ascii_info
-                display_menu
                 ;;
             *)
                 echo -e "\n${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Invalid selection${RESET}\n"
-                sleep 1
+                sleep 0.5
                 ;;
         esac
         
         echo ""
-        read -rp "${BRIGHT_BLUE}Press Enter to continue..."
+        read -rp "${BRIGHT_BLUE}Press Enter to continue...${RESET}"
         clear
-        display_ascii_info
-        network_reconnaissance_menu
+        return
     done
 }
 
@@ -481,6 +508,7 @@ handle_selection() {
             ;;
         2)
             echo -e "\n${BRIGHT_RED}[◆]${RESET} Launching VULNERABILITY SCANNER...\n"
+            vulnerability_menu
             sleep 1
             ;;
         3)
@@ -516,12 +544,11 @@ handle_selection() {
 
 Main_Loop(){
     # Main loop
+    clear
     while true; do
     display_ascii_info
     display_menu
-    
     read -rp " ${BRIGHT_BLUE}user@nexus:~${RESET}${BRIGHT_RED}\$${RESET} " choice
-    
     handle_selection "$choice"
 done
 }
