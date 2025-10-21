@@ -312,6 +312,7 @@ network_reconnaissance_menu(){
             *)
                 echo -e "\n${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Invalid selection${RESET}\n"
                 sleep 1
+                clear
                 ;;
         esac
         
@@ -323,11 +324,6 @@ network_reconnaissance_menu(){
 }
 
 
-netword_reconnaissance() {
-    network_reconnaissance_menu
-}
-
-
 #CHOICE 2: Vulnerability Scanning
 vulnerability_menu(){
     clear
@@ -336,7 +332,7 @@ vulnerability_menu(){
     echo ""
     echo ""
     echo "      ╔══════════════════════════════════════════════╗"
-    echo "      ║${RESET}     ${BRIGHT_BLUE}▓▒░  VULNERABILITY SCANNING  ░▒▓${BRIGHT_RED}       ║"
+    echo "      ║${RESET}     ${BRIGHT_BLUE}▓▒░  VULNERABILITY SCANNING  ░▒▓${BRIGHT_RED}         ║"
     echo "      ╚══════════════════════════════════════════════╝"
     echo -e "${RESET}"
     
@@ -477,7 +473,216 @@ vulnerability_menu(){
                 ;;
             *)
                 echo -e "\n${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Invalid selection${RESET}\n"
-                sleep 0.5
+                sleep 1
+                clear
+                ;;
+        esac
+        
+        echo ""
+        read -rp "${BRIGHT_BLUE}Press Enter to continue...${RESET}"
+        clear
+        return
+    done
+}
+
+# CHOICE 3: Exploitation Framework
+exploitation_menu(){
+    clear
+    display_ascii_info
+    echo -e "${BRIGHT_RED}"
+    echo ""
+    echo ""
+    echo "      ╔══════════════════════════════════════════════╗"
+    echo "      ║${RESET}     ${BRIGHT_BLUE}▓▒░  EXPLOITATION FRAMEWORK  ░▒▓${BRIGHT_RED}         ║"
+    echo "      ╚══════════════════════════════════════════════╝"
+    echo -e "${RESET}"
+    
+    echo -e "       System: ${BRIGHT_BLUE}OPERATIONAL${RESET}  ${BRIGHT_RED}✞${RESET}  Security Level: ${BRIGHT_RED}MAXIMUM${RESET}"
+    echo ""
+    echo -e "        ${BRIGHT_BLUE}┌─                                      ─┐${RESET}"
+    echo ""
+
+    local options=(
+        "1) Metasploit Framework"
+        "2) SearchSploit"
+        "3) RouterSploit"
+        "4) BeEF"
+        "5) AutoSploit"
+        "6) SPARTA"
+        "7) Sn1per"
+        "99) Back to Main Menu"
+    )
+    
+    for option in "${options[@]}"; do
+        echo -e "            ${RED}[${option%%)*}]${RESET} ${BRIGHT_BLUE}${option#*)}${RESET}"
+    done
+    
+    echo ""
+    echo -e "        ${BRIGHT_BLUE}└──                                    ──┘${RESET}"
+    echo ""
+    
+    while true; do
+        read -rp " ${BRIGHT_BLUE}user@nexus:~${RESET}${BRIGHT_RED}\$${RESET} " sub_choice
+        
+        case $sub_choice in
+            1)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Metasploit Framework...\n"
+                if ! command -v msfconsole &> /dev/null; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Metasploit is not installed.${RESET}"
+                    read -rp "Would you like to install it? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing Metasploit Framework...\n"
+                        curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall
+                        chmod 755 msfinstall
+                        sudo ./msfinstall
+                        rm msfinstall
+                    fi
+                fi
+                if command -v msfconsole &> /dev/null; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Launching Metasploit Console...\n"
+                    msfconsole
+                fi
+                ;;
+            2)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking SearchSploit...\n"
+                if ! command -v searchsploit &> /dev/null; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}SearchSploit is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning ExploitDB from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/offensive-security/exploitdb.git ~/tools/exploitdb
+                        sudo ln -sf ~/tools/exploitdb/searchsploit /usr/local/bin/searchsploit
+                    fi
+                fi
+                if command -v searchsploit &> /dev/null; then
+                    read -rp "Enter search keyword: " keyword
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Searching ExploitDB for: $keyword\n"
+                    searchsploit "$keyword"
+                fi
+                ;;
+            3)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking RouterSploit...\n"
+                if [ ! -d ~/tools/routersploit ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}RouterSploit is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning RouterSploit from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/threat9/routersploit ~/tools/routersploit
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing dependencies...\n"
+                        cd ~/tools/routersploit
+                        pip3 install -r requirements.txt
+                        cd -
+                    fi
+                fi
+                if [ -d ~/tools/routersploit ]; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Launching RouterSploit Framework...\n"
+                    cd ~/tools/routersploit
+                    python3 rsf.py
+                    cd -
+                fi
+                ;;
+            4)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking BeEF (Browser Exploitation Framework)...\n"
+                if [ ! -d ~/tools/beef ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}BeEF is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning BeEF from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/beefproject/beef ~/tools/beef
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing dependencies...\n"
+                        cd ~/tools/beef
+                        sudo apt-get install -y ruby ruby-dev libsqlite3-dev
+                        sudo gem install bundler
+                        bundle install
+                        cd -
+                    fi
+                fi
+                if [ -d ~/tools/beef ]; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Starting BeEF Server...\n"
+                    echo -e "${BRIGHT_BLUE}Default credentials: beef:beef${RESET}"
+                    echo -e "${BRIGHT_BLUE}Access at: http://127.0.0.1:3000/ui/panel${RESET}\n"
+                    cd ~/tools/beef
+                    ./beef
+                    cd -
+                fi
+                ;;
+            5)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking AutoSploit...\n"
+                if [ ! -d ~/tools/AutoSploit ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}AutoSploit is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning AutoSploit from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/NullArray/AutoSploit.git ~/tools/AutoSploit
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing dependencies...\n"
+                        cd ~/tools/AutoSploit
+                        pip3 install -r requirements.txt
+                        cd -
+                    fi
+                fi
+                if [ -d ~/tools/AutoSploit ]; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Launching AutoSploit...\n"
+                    echo -e "${BRIGHT_BLUE}Note: Requires Metasploit installed${RESET}\n"
+                    cd ~/tools/AutoSploit
+                    python3 autosploit.py
+                    cd -
+                fi
+                ;;
+            6)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking SPARTA...\n"
+                if [ ! -d ~/tools/sparta ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}SPARTA is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ses])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning SPARTA from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/SECFORCE/sparta.git ~/tools/sparta
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing dependencies...\n"
+                        sudo apt-get install -y python3-pyqt5 python3-sqlalchemy python3-pyqt5.qtwebkit ldap-utils rwho rsh-client x11-apps finger
+                    fi
+                fi
+                if [ -d ~/tools/sparta ]; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Launching SPARTA GUI...\n"
+                    cd ~/tools/sparta
+                    sudo python3 sparta.py
+                    cd -
+                fi
+                ;;
+            7)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Sn1per...\n"
+                if ! command -v sniper &> /dev/null; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Sn1per is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning Sn1per from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/1N3/Sn1per ~/tools/Sn1per
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing Sn1per (this may take a while)...\n"
+                        cd ~/tools/Sn1per
+                        sudo bash install.sh
+                        cd -
+                    fi
+                fi
+                if command -v sniper &> /dev/null; then
+                    read -rp "Enter target (IP/domain): " target
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running Sn1per scan on: $target\n"
+                    sudo sniper -t "$target"
+                fi
+                ;;
+            99)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Returning to Main Menu...\n"
+                sleep 1
+                clear
+                return
+                ;;
+            *)
+                echo -e "\n${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Invalid selection${RESET}\n"
+                sleep 1
+                clear
                 ;;
         esac
         
@@ -494,9 +699,6 @@ vulnerability_menu(){
 
 
 
-
-
-
 #MAIN SELECTION HANDLER
 
 handle_selection() {
@@ -504,16 +706,17 @@ handle_selection() {
         1)
             echo -e "\n${BRIGHT_RED}[◆]${RESET} Initializing NETWORK RECONNAISSANCE...\n"
             sleep 1
-            netword_reconnaissance
+            netword_reconnaissance_menu
             ;;
         2)
             echo -e "\n${BRIGHT_RED}[◆]${RESET} Launching VULNERABILITY SCANNER...\n"
-            vulnerability_menu
             sleep 1
+            vulnerability_menu
             ;;
         3)
             echo -e "\n${BRIGHT_RED}[◆]${RESET} Loading EXPLOITATION FRAMEWORK...\n"
             sleep 1
+            exploitation_menu
             ;;
         4)
             echo -e "\n${BRIGHT_RED}[◆]${RESET} Activating POST-EXPLOITATION modules...\n"
@@ -537,6 +740,7 @@ handle_selection() {
         *)
             echo -e "\n${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Invalid selection${RESET}\n"
             sleep 1
+            clear
             ;;
     esac
 }
