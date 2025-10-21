@@ -50,7 +50,7 @@ info_list=(
     ""
     "OS: Militech APOGEE SANDEVISTAN"
     "Architecture: cw_system_sandevistanedgerunner x64"
-    "Creator: Melvin PETIT"
+    "Creator: ${BRIGHT_BLUE}\e]8;;https://github.com/WhiteMuush\aMelvin PETIT\e]8;;\a${RESET}"
     ""
     "*━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━......."
     ""
@@ -706,7 +706,7 @@ handle_selection() {
         1)
             echo -e "\n${BRIGHT_RED}[◆]${RESET} Initializing NETWORK RECONNAISSANCE...\n"
             sleep 1
-            netword_reconnaissance_menu
+            network_reconnaissance_menu
             ;;
         2)
             echo -e "\n${BRIGHT_RED}[◆]${RESET} Launching VULNERABILITY SCANNER...\n"
