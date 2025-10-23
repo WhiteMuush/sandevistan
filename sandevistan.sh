@@ -748,7 +748,7 @@ postexploitation_menu(){
                 if [ -d ~/tools/PEASS-ng ]; then
                     echo -e "\n${BRIGHT_RED}[◆]${RESET} PEASS-ng Tools Available:\n"
                     echo -e "${BRIGHT_BLUE}[1]${RESET} LinPEAS (Linux)"
-                    echo -e "${BRIGHT_BLUE}[2]${RESET} WinPEAS (Windows)"
+                    echo -e "${BRIGHT_BLUE}[2]${RESET} WinPEAS (Windows or WSL)"
                     echo -e "${BRIGHT_BLUE}[3]${RESET} Show scripts location"
                     read -rp "Select option: " peass_choice
                     case $peass_choice in
@@ -756,6 +756,7 @@ postexploitation_menu(){
                             echo -e "\n${BRIGHT_RED}[◆]${RESET} Running LinPEAS...\n"
                             cd ~/tools/PEASS-ng/linPEAS
                             chmod +x linpeas.sh
+                            sleep 0.5
                             ./linpeas.sh
                             cd -
                             ;;
@@ -978,7 +979,333 @@ postexploitation_menu(){
     done
 }
 
+#CHOICE 5: Credential Harvester (Placeholder)
 
+credential_menu(){
+    clear
+    display_ascii_info
+    echo -e "${BRIGHT_RED}"
+    echo ""
+    echo ""
+    echo "      ╔══════════════════════════════════════════════╗"
+    echo "      ║${RESET}     ${BRIGHT_BLUE}▓▒░  CREDENTIAL HARVESTING  ░▒▓${BRIGHT_RED}       ║"
+    echo "      ╚══════════════════════════════════════════════╝"
+    echo -e "${RESET}"
+    
+    echo -e "       System: ${BRIGHT_BLUE}OPERATIONAL${RESET}  ${BRIGHT_RED}✞${RESET}  Security Level: ${BRIGHT_RED}MAXIMUM${RESET}"
+    echo ""
+    echo -e "        ${BRIGHT_BLUE}┌─                                      ─┐${RESET}"
+    echo ""
+
+    local options=(
+        "1) Hashcat"
+        "2) John the Ripper"
+        "3) Hydra"
+        "4) CrackMapExec"
+        "5) Responder"
+        "6) CredMaster"
+        "7) BruteSpray"
+        "99) Back to Main Menu"
+    )
+    
+    for option in "${options[@]}"; do
+        echo -e "            ${RED}[${option%%)*}]${RESET} ${BRIGHT_BLUE}${option#*)}${RESET}"
+    done
+    
+    echo ""
+    echo -e "        ${BRIGHT_BLUE}└──                                    ──┘${RESET}"
+    echo ""
+    
+    while true; do
+        read -rp " ${BRIGHT_BLUE}user@nexus:~${RESET}${BRIGHT_RED}\$${RESET} " sub_choice
+        
+        case $sub_choice in
+            1)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Hashcat...\n"
+                if check_and_install_tool "hashcat" "sudo apt-get install -y hashcat"; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Hashcat Hash Cracking:\n"
+                    echo -e "${BRIGHT_BLUE}[1]${RESET} Crack MD5 hash"
+                    echo -e "${BRIGHT_BLUE}[2]${RESET} Crack NTLM hash"
+                    echo -e "${BRIGHT_BLUE}[3]${RESET} Crack SHA256 hash"
+                    echo -e "${BRIGHT_BLUE}[4]${RESET} Show hash modes"
+                    echo -e "${BRIGHT_BLUE}[5]${RESET} Custom attack"
+                    read -rp "Select option: " hash_choice
+                    case $hash_choice in
+                        1)
+                            read -rp "Enter hash file path: " hashfile
+                            read -rp "Enter wordlist path (default: /usr/share/wordlists/rockyou.txt): " wordlist
+                            wordlist=${wordlist:-/usr/share/wordlists/rockyou.txt}
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Cracking MD5 hashes...\n"
+                            hashcat -m 0 -a 0 "$hashfile" "$wordlist"
+                            ;;
+                        2)
+                            read -rp "Enter hash file path: " hashfile
+                            read -rp "Enter wordlist path: " wordlist
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Cracking NTLM hashes...\n"
+                            hashcat -m 1000 -a 0 "$hashfile" "$wordlist"
+                            ;;
+                        3)
+                            read -rp "Enter hash file path: " hashfile
+                            read -rp "Enter wordlist path: " wordlist
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Cracking SHA256 hashes...\n"
+                            hashcat -m 1400 -a 0 "$hashfile" "$wordlist"
+                            ;;
+                        4)
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Common Hash Modes:\n"
+                            hashcat --example-hashes | head -n 50
+                            ;;
+                        5)
+                            read -rp "Enter hash mode (-m): " mode
+                            read -rp "Enter hash file: " hashfile
+                            read -rp "Enter wordlist: " wordlist
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Running custom attack...\n"
+                            hashcat -m "$mode" -a 0 "$hashfile" "$wordlist"
+                            ;;
+                    esac
+                fi
+                ;;
+            2)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking John the Ripper...\n"
+                if check_and_install_tool "john" "sudo apt-get install -y john"; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} John the Ripper:\n"
+                    echo -e "${BRIGHT_BLUE}[1]${RESET} Crack password file"
+                    echo -e "${BRIGHT_BLUE}[2]${RESET} Crack with wordlist"
+                    echo -e "${BRIGHT_BLUE}[3]${RESET} Show cracked passwords"
+                    echo -e "${BRIGHT_BLUE}[4]${RESET} Crack ZIP file"
+                    read -rp "Select option: " john_choice
+                    case $john_choice in
+                        1)
+                            read -rp "Enter hash file path: " hashfile
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Cracking with default mode...\n"
+                            john "$hashfile"
+                            ;;
+                        2)
+                            read -rp "Enter hash file path: " hashfile
+                            read -rp "Enter wordlist path: " wordlist
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Cracking with wordlist...\n"
+                            john --wordlist="$wordlist" "$hashfile"
+                            ;;
+                        3)
+                            read -rp "Enter hash file path: " hashfile
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Showing cracked passwords...\n"
+                            john --show "$hashfile"
+                            ;;
+                        4)
+                            read -rp "Enter ZIP file path: " zipfile
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Extracting hash from ZIP...\n"
+                            zip2john "$zipfile" > zip_hash.txt
+                            echo -e "${BRIGHT_RED}[◆]${RESET} Cracking ZIP password...\n"
+                            john zip_hash.txt
+                            ;;
+                    esac
+                fi
+                ;;
+            3)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Hydra...\n"
+                if check_and_install_tool "hydra" "sudo apt-get install -y hydra"; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Hydra Network Brute Force:\n"
+                    echo -e "${BRIGHT_BLUE}[1]${RESET} SSH brute force"
+                    echo -e "${BRIGHT_BLUE}[2]${RESET} FTP brute force"
+                    echo -e "${BRIGHT_BLUE}[3]${RESET} HTTP POST brute force"
+                    echo -e "${BRIGHT_BLUE}[4]${RESET} RDP brute force"
+                    echo -e "${BRIGHT_BLUE}[5]${RESET} SMB brute force"
+                    read -rp "Select option: " hydra_choice
+                    case $hydra_choice in
+                        1)
+                            read -rp "Enter target IP: " target
+                            read -rp "Enter username (or user list file): " user
+                            read -rp "Enter password list: " passlist
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Brute forcing SSH...\n"
+                            hydra -l "$user" -P "$passlist" "$target" ssh
+                            ;;
+                        2)
+                            read -rp "Enter target IP: " target
+                            read -rp "Enter username: " user
+                            read -rp "Enter password list: " passlist
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Brute forcing FTP...\n"
+                            hydra -l "$user" -P "$passlist" "$target" ftp
+                            ;;
+                        3)
+                            read -rp "Enter target URL: " target
+                            read -rp "Enter username: " user
+                            read -rp "Enter password list: " passlist
+                            read -rp "Enter POST parameters: " params
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Brute forcing HTTP POST...\n"
+                            hydra -l "$user" -P "$passlist" "$target" http-post-form "$params"
+                            ;;
+                        4)
+                            read -rp "Enter target IP: " target
+                            read -rp "Enter username: " user
+                            read -rp "Enter password list: " passlist
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Brute forcing RDP...\n"
+                            hydra -l "$user" -P "$passlist" rdp://"$target"
+                            ;;
+                        5)
+                            read -rp "Enter target IP: " target
+                            read -rp "Enter username: " user
+                            read -rp "Enter password list: " passlist
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Brute forcing SMB...\n"
+                            hydra -l "$user" -P "$passlist" "$target" smb
+                            ;;
+                    esac
+                fi
+                ;;
+            4)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking CrackMapExec...\n"
+                if ! command -v crackmapexec &> /dev/null && ! command -v cme &> /dev/null; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}CrackMapExec is not installed.${RESET}"
+                    read -rp "Would you like to install it? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing CrackMapExec...\n"
+                        sudo apt-get install -y crackmapexec
+                    fi
+                fi
+                if command -v crackmapexec &> /dev/null || command -v cme &> /dev/null; then
+                    CME_CMD=$(command -v crackmapexec || command -v cme)
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} CrackMapExec Operations:\n"
+                    echo -e "${BRIGHT_BLUE}[1]${RESET} SMB password spray"
+                    echo -e "${BRIGHT_BLUE}[2]${RESET} SMB enumeration"
+                    echo -e "${BRIGHT_BLUE}[3]${RESET} Dump SAM database"
+                    echo -e "${BRIGHT_BLUE}[4]${RESET} Pass-the-Hash"
+                    read -rp "Select option: " cme_choice
+                    case $cme_choice in
+                        1)
+                            read -rp "Enter target IP/range: " target
+                            read -rp "Enter username: " user
+                            read -rp "Enter password: " pass
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Password spraying...\n"
+                            $CME_CMD smb "$target" -u "$user" -p "$pass"
+                            ;;
+                        2)
+                            read -rp "Enter target IP: " target
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Enumerating SMB shares...\n"
+                            $CME_CMD smb "$target" --shares
+                            ;;
+                        3)
+                            read -rp "Enter target IP: " target
+                            read -rp "Enter username: " user
+                            read -rp "Enter password: " pass
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Dumping SAM...\n"
+                            $CME_CMD smb "$target" -u "$user" -p "$pass" --sam
+                            ;;
+                        4)
+                            read -rp "Enter target IP: " target
+                            read -rp "Enter username: " user
+                            read -rp "Enter NTLM hash: " hash
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Pass-the-Hash attack...\n"
+                            $CME_CMD smb "$target" -u "$user" -H "$hash"
+                            ;;
+                    esac
+                fi
+                ;;
+            5)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Responder...\n"
+                if [ ! -d ~/tools/Responder ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Responder is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning Responder from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/lgandx/Responder.git ~/tools/Responder
+                    fi
+                fi
+                if [ -d ~/tools/Responder ]; then
+                    read -rp "Enter network interface (e.g., eth0): " interface
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Starting Responder to capture credentials...\n"
+                    echo -e "${BRIGHT_BLUE}Press Ctrl+C to stop${RESET}\n"
+                    cd ~/tools/Responder
+                    sudo python3 Responder.py -I "$interface" -wrf
+                    cd -
+                fi
+                ;;
+            6)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking CredMaster...\n"
+                if [ ! -d ~/tools/CredMaster ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}CredMaster is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning CredMaster from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/knavesec/CredMaster.git ~/tools/CredMaster
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing dependencies...\n"
+                        pip3 install -r ~/tools/CredMaster/requirements.txt
+                    fi
+                fi
+                if [ -d ~/tools/CredMaster ]; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} CredMaster Password Spraying:\n"
+                    echo -e "${BRIGHT_BLUE}[1]${RESET} Office365 spray"
+                    echo -e "${BRIGHT_BLUE}[2]${RESET} OWA spray"
+                    echo -e "${BRIGHT_BLUE}[3]${RESET} Custom spray"
+                    read -rp "Select option: " cred_choice
+                    case $cred_choice in
+                        1)
+                            read -rp "Enter user list file: " userlist
+                            read -rp "Enter password: " password
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Spraying Office365...\n"
+                            cd ~/tools/CredMaster
+                            python3 credmaster.py --plugin o365 -u "$userlist" -p "$password"
+                            cd -
+                            ;;
+                        2)
+                            read -rp "Enter OWA URL: " url
+                            read -rp "Enter user list file: " userlist
+                            read -rp "Enter password: " password
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Spraying OWA...\n"
+                            cd ~/tools/CredMaster
+                            python3 credmaster.py --plugin owa --url "$url" -u "$userlist" -p "$password"
+                            cd -
+                            ;;
+                        3)
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Available plugins:\n"
+                            cd ~/tools/CredMaster
+                            python3 credmaster.py --list-plugins
+                            cd -
+                            ;;
+                    esac
+                fi
+                ;;
+            7)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking BruteSpray...\n"
+                if [ ! -d ~/tools/brutespray ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}BruteSpray is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning BruteSpray from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/x90skysn3k/brutespray.git ~/tools/brutespray
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing dependencies...\n"
+                        cd ~/tools/brutespray
+                        pip3 install -r requirements.txt
+                        cd -
+                    fi
+                fi
+                if [ -d ~/tools/brutespray ]; then
+                    read -rp "Enter Nmap XML file path: " nmapfile
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Running BruteSpray on discovered services...\n"
+                    cd ~/tools/brutespray
+                    python3 brutespray.py --file "$nmapfile" --threads 5 --hosts 5
+                    cd -
+                fi
+                ;;
+            99)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Returning to Main Menu...\n"
+                sleep 1
+                clear
+                return
+                ;;
+            *)
+                echo -e "\n${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Invalid selection${RESET}\n"
+                sleep 1
+                clear
+                ;;
+        esac
+        
+        echo ""
+        read -rp "${BRIGHT_BLUE}Press Enter to continue...${RESET}"
+        clear
+        return
+    done
+}
 
 
 
@@ -1010,6 +1337,7 @@ handle_selection() {
         5)
             echo -e "\n${BRIGHT_RED}[◆]${RESET} Starting CREDENTIAL HARVESTER...\n"
             sleep 1
+            credential_menu
             ;;
         6)
             echo -e "\n${BRIGHT_RED}[◆]${RESET} Generating PAYLOAD...\n"
