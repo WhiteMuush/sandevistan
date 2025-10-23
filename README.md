@@ -7,6 +7,10 @@
 ## Quick Start
 
 ```bash
+
+# If you don't have Python3
+sudo apt install python3 
+
 # Clone the repository
 git clone https://github.com/WhiteMuush/sandevistan.git
 
@@ -16,6 +20,7 @@ cd sandevistan
 # Make the script executable and run
 chmod +x sandevistan.sh
 sudo bash sandevistan.sh
+
 ```
 
 
