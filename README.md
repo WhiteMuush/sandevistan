@@ -37,28 +37,28 @@ sudo bash sandevistan.sh
 # 6 integrated modules:
 
 ### Network Reconnaissance
-Quick discovery and footprinting to map targets and enumerate services.
-- Tools: `Nmap`, `Masscan`, `Amass`, `Recon-ng`, `Sublister`, `TheHarvester`, `dnsenum`, `WhatWeb`, `Dirbuster`
+Quick discovery and footprinting to map targets and enumerate services.  
+- Tools: [Nmap](https://github.com/nmap/nmap), [Masscan](https://github.com/robertdavidgraham/masscan), [Amass](https://github.com/OWASP/Amass), [Recon-ng](https://github.com/lanmaster53/recon-ng), [Sublist3r](https://github.com/aboul3la/Sublist3r), [theHarvester](https://github.com/laramies/theHarvester), [dnsenum (search)](https://github.com/search?q=dnsenum), [WhatWeb](https://github.com/urbanadventurer/WhatWeb), [DirBuster](https://github.com/OWASP/dirbuster)
 
 ### Vulnerability Scanning
-Automated checks to find common and custom vulnerabilities across web and network surfaces.
-- Tools: `Nikto`, `Nuclei`, `Wapiti`, `SQLMap`, `XSStrike`, `Commix`, `WPScan`
+Automated checks to find common and custom vulnerabilities across web and network surfaces.  
+- Tools: [Nikto](https://github.com/sullo/nikto), [Nuclei](https://github.com/projectdiscovery/nuclei), [Wapiti](https://github.com/wapiti-scanner/wapiti), [sqlmap](https://github.com/sqlmapproject/sqlmap), [XSStrike](https://github.com/s0md3v/XSStrike), [Commix](https://github.com/commixproject/commix), [WPScan](https://github.com/wpscanteam/wpscan)
 
 ### Exploitation Framework
-Frameworks and targeted exploit tools for validating vulnerabilities and gaining initial access.
-- Tools: `Metasploit`, `RouterSploit`, `BeEF`, `AutoSploit`
+Frameworks and targeted exploit tools for validating vulnerabilities and gaining initial access.  
+- Tools: [Metasploit Framework / msfvenom](https://github.com/rapid7/metasploit-framework), [RouterSploit](https://github.com/threat9/routersploit), [BeEF](https://github.com/beefproject/beef), [AutoSploit](https://github.com/NullArray/AutoSploit)
 
 ### Post-Exploitation
-Tools for lateral movement, persistence, and deeper system enumeration after compromise.
-- Tools: `LinPEAS` / `WinPEAS`, `LaZagne`, `Mimikatz`, `PowerSploit`, `Linux Smart Enumeration`, `Impacket`
+Tools for lateral movement, persistence, and deeper system enumeration after compromise.  
+- Tools: [PEASS-ng (LinPEAS / WinPEAS)](https://github.com/carlospolop/PEASS-ng), [LaZagne](https://github.com/AlessandroZ/LaZagne), [Mimikatz](https://github.com/gentilkiwi/mimikatz), [PowerSploit](https://github.com/PowerShellMafia/PowerSploit), [Linux Smart Enumeration](https://github.com/diego-treitos/linux-smart-enumeration), [Impacket](https://github.com/SecureAuthCorp/impacket)
 
 ### Credential Harvesting
-Password cracking, credential capture, and network credential abuse utilities.
-- Tools: `Hashcat`, `John the Ripper`, `Hydra`, `CrackMapExec`, `Responder`, `CredMaster`, `BruteSpray`
+Password cracking, credential capture, and network credential abuse utilities.  
+- Tools: [hashcat](https://github.com/hashcat/hashcat), [John the Ripper](https://github.com/openwall/john), [Hydra](https://github.com/vanhauser-thc/thc-hydra), [CrackMapExec](https://github.com/byt3bl33d3r/CrackMapExec), [Responder](https://github.com/lgandx/Responder), [CredMaster (search)](https://github.com/search?q=CredMaster), [BruteSpray](https://github.com/x90skysn3k/brutespray)
 
 ### Payload Generation
-Generators and obfuscators for custom payload creation and delivery.
-- Tools: `MSFVenom`, `Veil`, `TheFatRat`, `Hoaxshell`, `DOnut`, `ScareCrow`
+Generators and obfuscators for custom payload creation and delivery.  
+- Tools: [msfvenom (Metasploit)](https://github.com/rapid7/metasploit-framework), [Veil](https://github.com/Veil-Framework/Veil), [TheFatRat](https://github.com/Screetsec/TheFatRat), [Hoaxshell](https://github.com/Tib3rius/Hoaxshell), [Donut](https://github.com/TheWover/donut), [ScareCrow (search)](https://github.com/search?q=ScareCrow)
 
 
 ## A Unique Cyberpunk Interface Style
