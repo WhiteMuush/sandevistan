@@ -36,12 +36,29 @@ sudo bash sandevistan.sh
 
 # 6 integrated modules:
 
-**Network Reconnaissance** - Nmap, Masscan, Recon-ng, Amass, Sublister, TheHarvester, Dirbuster, dnsenum, WhatWeb
-**Vulnerability Scanning** - Nikto, Nuclei, Wapiti, SQLMap, XSStrike, Commix, WPScan
-**Exploitation Framework** - Metasploit, RouterSploit, BeEF, AutoSploit
-**Post-Exploitation** - LinPEAS/WinPEAS, LaZagne, Mimikatz, PowerSploit, Linux Smart Enumeration, Impacket
-**Credential Harvesting** - Hashcat, John the Ripper, Hydra, CrackMapExec, Responder, CredMaster, BruteSpray
-**Payload Generation** - MSFVenom, Veil, TheFatRat, Hoaxshell, DOnut, ScareCrow
+### Network Reconnaissance
+Quick discovery and footprinting to map targets and enumerate services.
+- Tools: `Nmap`, `Masscan`, `Amass`, `Recon-ng`, `Sublister`, `TheHarvester`, `dnsenum`, `WhatWeb`, `Dirbuster`
+
+### Vulnerability Scanning
+Automated checks to find common and custom vulnerabilities across web and network surfaces.
+- Tools: `Nikto`, `Nuclei`, `Wapiti`, `SQLMap`, `XSStrike`, `Commix`, `WPScan`
+
+### Exploitation Framework
+Frameworks and targeted exploit tools for validating vulnerabilities and gaining initial access.
+- Tools: `Metasploit`, `RouterSploit`, `BeEF`, `AutoSploit`
+
+### Post-Exploitation
+Tools for lateral movement, persistence, and deeper system enumeration after compromise.
+- Tools: `LinPEAS` / `WinPEAS`, `LaZagne`, `Mimikatz`, `PowerSploit`, `Linux Smart Enumeration`, `Impacket`
+
+### Credential Harvesting
+Password cracking, credential capture, and network credential abuse utilities.
+- Tools: `Hashcat`, `John the Ripper`, `Hydra`, `CrackMapExec`, `Responder`, `CredMaster`, `BruteSpray`
+
+### Payload Generation
+Generators and obfuscators for custom payload creation and delivery.
+- Tools: `MSFVenom`, `Veil`, `TheFatRat`, `Hoaxshell`, `DOnut`, `ScareCrow`
 
 
 ## A Unique Cyberpunk Interface Style
