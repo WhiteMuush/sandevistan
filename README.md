@@ -34,6 +34,16 @@ sudo bash sandevistan.sh
 - **Optimized Performance**: Pre-configured for maximum efficiency
 - **Easy Deployment**: Simple installation and setup process
 
+# 6 integrated modules:
+
+**Network Reconnaissance** - Nmap, Masscan, Recon-ng, Amass, Sublister, TheHarvester, Dirbuster, dnsenum, WhatWeb
+**Vulnerability Scanning** - Nikto, Nuclei, Wapiti, SQLMap, XSStrike, Commix, WPScan
+**Exploitation Framework** - Metasploit, RouterSploit, BeEF, AutoSploit
+**Post-Exploitation** - LinPEAS/WinPEAS, LaZagne, Mimikatz, PowerSploit, Linux Smart Enumeration, Impacket
+**Credential Harvesting** - Hashcat, John the Ripper, Hydra, CrackMapExec, Responder, CredMaster, BruteSpray
+**Payload Generation** - MSFVenom, Veil, TheFatRat, Hoaxshell, DOnut, ScareCrow
+
+
 ## A Unique Cyberpunk Interface Style
 
 Experience a visually stunning and immersive interface that embodies the essence of cyberpunk aesthetics. Our design combines futuristic elements with a user-friendly layout, ensuring that you not only work efficiently but also enjoy the process. Dive into a world where technology meets art, enhancing your cybersecurity tasks with a unique flair.
