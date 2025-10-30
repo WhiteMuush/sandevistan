@@ -66,8 +66,7 @@ Generators and obfuscators for custom payload creation and delivery.
 Experience a visually stunning and immersive interface that embodies the essence of cyberpunk aesthetics. Our design combines futuristic elements with a user-friendly layout, ensuring that you not only work efficiently but also enjoy the process. Dive into a world where technology meets art, enhancing your cybersecurity tasks with a unique flair.
 
 
-
-<img width="1676" height="1014" alt="Capture d’écran 2025-10-17 165603" src="https://github.com/user-attachments/assets/64dc5645-27c6-4a96-8e50-752ed2f5b0fd" />
+<img width="1678" height="1022" alt="Sandevistan Capture of tools for Readme" src="https://github.com/user-attachments/assets/f035cf9c-6e55-460e-a731-29a5b996ad85" />
 
 
 ## License
