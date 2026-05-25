@@ -37,5 +37,6 @@ fi
 export RESET BOLD RED GREEN BLUE GRAY BRIGHT_RED BRIGHT_GREEN BRIGHT_BLUE
 
 # Cached username for the prompt; computed once.
-readonly SANDEVISTAN_USER="$(whoami)"
+SANDEVISTAN_USER="$(whoami)"
+readonly SANDEVISTAN_USER
 export SANDEVISTAN_USER
