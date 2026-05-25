@@ -1,0 +1,34 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors / IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs and runtime
+*.log
+*.tmp
+*.bak
+*.pid
+
+# Generated payloads / artifacts produced by tools at runtime
+payload.exe
+payload.elf
+payload.php
+payload.py
+payload.apk
+payload.bin
+*.lst
+zip_hash.txt
+
+# External tools cloned at runtime (users should keep this outside the repo)
+tools/
+
+# Local environment overrides
+.env
+.env.local

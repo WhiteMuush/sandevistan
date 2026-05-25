@@ -1,0 +1,60 @@
+name: Bug report
+description: Report something that doesn't work as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill out the fields
+        below so we can reproduce and fix it.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened? What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: List the menu choices or commands that trigger the bug.
+      placeholder: |
+        1. Launch `./sandevistan.sh`
+        2. Choose option 1 (Network Reconnaissance)
+        3. Choose option 4 (Amass)
+        4. ...
+    validations:
+      required: true
+
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution and version
+      placeholder: "Kali Linux 2024.4 / Ubuntu 22.04 / Parrot OS 6.0"
+    validations:
+      required: true
+
+  - type: input
+    id: bash
+    attributes:
+      label: Bash version
+      description: Output of `bash --version | head -n1`
+      placeholder: "GNU bash, version 5.2.15(1)-release"
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs / output
+      description: Paste any error output. Please redact sensitive information.
+      render: shell
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have searched existing issues and confirmed this is not a duplicate
+          required: true

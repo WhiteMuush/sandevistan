@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run shellcheck
+        uses: ludeeus/action-shellcheck@master
+        env:
+          SHELLCHECK_OPTS: -e SC1091 -e SC2034
+        with:
+          severity: warning
+
+  bash-syntax:
+    name: Bash syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: bash -n on every .sh file
+        run: |
+          set -euo pipefail
+          fail=0
+          while IFS= read -r -d '' f; do
+            if ! bash -n "$f"; then
+              echo "::error file=$f::syntax error"
+              fail=1
+            fi
+          done < <(find . -type f -name '*.sh' -print0)
+          exit $fail
+
+  source-smoke-test:
+    name: Source smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Source all libraries without executing the main loop
+        run: |
+          set -uo pipefail
+          # Source the entry-point; the guard in sandevistan.sh ensures the
+          # main loop is only triggered when executed (not sourced).
+          bash -c '
+            set -uo pipefail
+            export SANDEVISTAN_ROOT="$PWD"
+            # shellcheck disable=SC1091
+            source ./lib/core.sh
+            source ./lib/ui.sh
+            source ./lib/installer.sh
+            for m in ./lib/modules/*.sh; do source "$m"; done
+            # Sanity-check that the expected functions exist.
+            for fn in recon_menu vulnerability_menu exploitation_menu \
+                      postexploitation_menu credential_menu payload_menu \
+                      ensure_command ensure_repo prompt_yesno; do
+              declare -F "$fn" >/dev/null || { echo "missing: $fn"; exit 1; }
+            done
+            echo "All modules sourced and functions registered."
+          '

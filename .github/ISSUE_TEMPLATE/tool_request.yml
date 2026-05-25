@@ -1,0 +1,72 @@
+name: Tool integration request
+description: Propose adding a new security tool to SANDEVISTAN
+labels: ["enhancement", "tool-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening this request, please skim `docs/ADDING_A_TOOL.md`.
+        If you're already comfortable contributing the integration, feel free
+        to open a Pull Request instead.
+
+  - type: input
+    id: tool_name
+    attributes:
+      label: Tool name
+      placeholder: "e.g., feroxbuster"
+    validations:
+      required: true
+
+  - type: input
+    id: tool_url
+    attributes:
+      label: Upstream repository / homepage
+      placeholder: "https://github.com/epi052/feroxbuster"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Target module
+      options:
+        - Network Reconnaissance
+        - Vulnerability Scanning
+        - Exploitation Framework
+        - Post-Exploitation
+        - Credential Harvesting
+        - Payload Generator
+        - New module (explain below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why should it be added?
+      description: What gap does it fill? Is there an existing tool it would replace?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install_method
+    attributes:
+      label: Preferred installation method
+      options:
+        - apt
+        - git clone
+        - pip / pip3
+        - go install
+        - gem
+        - binary release
+        - other (explain below)
+    validations:
+      required: true
+
+  - type: input
+    id: license
+    attributes:
+      label: Upstream license
+      placeholder: "MIT / GPLv3 / BSD / ..."
+    validations:
+      required: true
