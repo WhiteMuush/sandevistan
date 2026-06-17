@@ -86,7 +86,7 @@ All three checks are also enforced in CI.
 
 ## Pull Request checklist
 
-- [ ] Targets `develop` (the default branch)
+- [ ] Targets `main` (the default branch)
 - [ ] Commits are focused and have meaningful messages
 - [ ] Code passes `bash -n`, `shellcheck` and `bats tests/`
 - [ ] Tested manually on a recent Kali/Parrot/Ubuntu
