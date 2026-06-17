@@ -132,14 +132,31 @@ export SANDEVISTAN_TOOLS_DIR=/opt/sandevistan-tools
 
 ## Testing
 
-There is no test framework yet (the project is interactive by nature). The
-CI runs three checks on every PR:
+The tool runners are interactive by nature, so CI focuses on the framework
+around them. Four checks run on every PR:
 
 - `bash -n` syntax check on every `.sh` file
 - `shellcheck -e SC1091 -e SC2034` (SC1091 = dynamic sources; SC2034 =
   unused exported color variables)
 - A *smoke test* that sources the entire lib without running the loop and
   verifies the expected functions are registered.
+- A [bats-core](https://github.com/bats-core/bats-core) unit suite under
+  `tests/`.
 
-If you want to add unit-level tests, [bats-core](https://github.com/bats-core/bats-core)
-is the recommended framework — open an issue first to discuss the scope.
+### Running the tests locally
+
+```bash
+# Debian/Ubuntu/Kali
+sudo apt-get install -y bats
+bats tests/
+```
+
+The suite covers the *framework* helpers only — colour degradation and the
+load guard (`core.bats`), the prompt/`maybe_sudo`/`ensure_command` gates
+(`installer.bats`), banner and menu rendering (`ui.bats`), and the entry
+point's source-guard and dispatcher (`entrypoint.bats`). Tests must never
+invoke a wrapped security tool; they assert on the helpers that surround it.
+
+When you add a tool, you usually do not need a new test: the smoke test and
+`entrypoint.bats` already assert that every module menu is registered. Add a
+bats case only when you introduce a new *helper* in `lib/`.

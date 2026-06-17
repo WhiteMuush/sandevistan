@@ -40,6 +40,7 @@ Requirements:
 
 - `bash` 5.x (the project targets modern Linux distros — Kali, Parrot, Ubuntu, …)
 - `shellcheck` for local linting
+- `bats` for running the unit suite (`apt-get install bats`)
 - `git`
 
 ```bash
@@ -57,9 +58,12 @@ find . -type f -name '*.sh' -exec bash -n {} +
 
 # Lint
 shellcheck sandevistan.sh lib/**/*.sh
+
+# Unit tests
+bats tests/
 ```
 
-Both checks are also enforced in CI.
+All three checks are also enforced in CI.
 
 ## Coding conventions
 
@@ -82,9 +86,9 @@ Both checks are also enforced in CI.
 
 ## Pull Request checklist
 
-- [ ] Targets `main` (or `master`, whichever the repo uses)
+- [ ] Targets `develop` (the default branch)
 - [ ] Commits are focused and have meaningful messages
-- [ ] Code passes `bash -n` and `shellcheck`
+- [ ] Code passes `bash -n`, `shellcheck` and `bats tests/`
 - [ ] Tested manually on a recent Kali/Parrot/Ubuntu
 - [ ] Documentation updated (README, `docs/`, in-file comments where needed)
 - [ ] No secrets, hard-coded credentials or pre-set targets committed
