@@ -34,6 +34,7 @@ chmod +x sandevistan.sh
 - **Streamlined Workflow** — No more tool hunting; everything at your fingertips
 - **Pluggable Architecture** — Add a new tool in one focused PR (see [docs/ADDING_A_TOOL.md](docs/ADDING_A_TOOL.md))
 - **Easy Deployment** — Simple installation, sensible defaults
+- **Engagement workspace**: every run opens a timestamped workspace (`loot/`, `output/`, `logs/`) and reports progress in an Ansible-style log (ok / changed / failed states plus a final `PLAY RECAP`), mirrored without colour to `logs/session.log`
 
 ## 6 Integrated Modules
 

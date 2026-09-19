@@ -13,6 +13,8 @@ sandevistan.sh             ── thin entry point: sources the lib and starts t
     ├── core.sh            ── colors, constants, project metadata
     ├── ui.sh              ── ASCII art, banners, menu rendering helpers
     ├── installer.sh       ── prompts, logging, install/run helpers
+    ├── logger.sh          ── Ansible-style run logging: TASK/PLAY, states, recap
+    ├── session.sh         ── engagement workspace (loot/output/logs) + run_logged
     └── modules/
         ├── recon.sh
         ├── vulnerability.sh
@@ -32,6 +34,8 @@ entry point is the only executable script.
    - `lib/core.sh` (palette, constants)
    - `lib/ui.sh` (banners — depends on core)
    - `lib/installer.sh` (helpers — depends on core)
+   - `lib/logger.sh` (run logging, depends on core)
+   - `lib/session.sh` (workspace + run_logged, depends on logger)
    - Every `lib/modules/*.sh` (depend on core + installer + ui)
 3. `main_loop` runs an infinite read-render-dispatch loop until the user
    chooses *LEAVE*.

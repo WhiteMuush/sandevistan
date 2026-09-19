@@ -13,8 +13,7 @@ recon_run_nmap() {
     local target
     target=$(prompt_value "Enter target (IP/hostname)")
     [[ -z "$target" ]] && { log_warn "Target is required."; return 0; }
-    log_step "Executing Nmap scan against ${target}"
-    nmap "$target"
+    run_logged "Nmap: ${target}" nmap "$target"
 }
 
 recon_run_masscan() {
@@ -22,13 +21,12 @@ recon_run_masscan() {
     local target ports
     target=$(prompt_value "Enter target (IP/range)")
     ports=$(prompt_value "Enter ports" "1-1000")
-    log_step "Running Masscan on ${target} ports ${ports}"
-    maybe_sudo masscan "$target" -p"$ports" --rate=1000
+    run_logged "Masscan: ${target} (${ports})" maybe_sudo masscan "$target" -p"$ports" --rate=1000
 }
 
 recon_run_recon_ng() {
     ensure_command "recon-ng" "install_apt recon-ng" || return 0
-    log_step "Starting Recon-ng"
+    log_task "Recon-ng (interactive)"
     recon-ng
 }
 
@@ -37,8 +35,7 @@ recon_run_amass() {
     local domain
     domain=$(prompt_value "Enter domain")
     [[ -z "$domain" ]] && { log_warn "Domain is required."; return 0; }
-    log_step "Running Amass enumeration on ${domain}"
-    amass enum -d "$domain"
+    run_logged "Amass: ${domain}" amass enum -d "$domain"
 }
 
 recon_run_sublist3r() {
@@ -46,8 +43,7 @@ recon_run_sublist3r() {
     local domain
     domain=$(prompt_value "Enter domain")
     [[ -z "$domain" ]] && { log_warn "Domain is required."; return 0; }
-    log_step "Running Sublist3r on ${domain}"
-    sublist3r -d "$domain"
+    run_logged "Sublist3r: ${domain}" sublist3r -d "$domain"
 }
 
 recon_run_theharvester() {
@@ -55,8 +51,7 @@ recon_run_theharvester() {
     local domain
     domain=$(prompt_value "Enter domain")
     [[ -z "$domain" ]] && { log_warn "Domain is required."; return 0; }
-    log_step "Running theHarvester on ${domain}"
-    theHarvester -d "$domain" -b all
+    run_logged "theHarvester: ${domain}" theHarvester -d "$domain" -b all
 }
 
 recon_run_dirb() {
@@ -64,8 +59,7 @@ recon_run_dirb() {
     local url
     url=$(prompt_value "Enter URL")
     [[ -z "$url" ]] && { log_warn "URL is required."; return 0; }
-    log_step "Running dirb against ${url}"
-    dirb "$url"
+    run_logged "dirb: ${url}" dirb "$url"
 }
 
 recon_run_dnsenum() {
@@ -73,8 +67,7 @@ recon_run_dnsenum() {
     local domain
     domain=$(prompt_value "Enter domain")
     [[ -z "$domain" ]] && { log_warn "Domain is required."; return 0; }
-    log_step "Running dnsenum on ${domain}"
-    dnsenum "$domain"
+    run_logged "dnsenum: ${domain}" dnsenum "$domain"
 }
 
 recon_run_whatweb() {
@@ -82,8 +75,7 @@ recon_run_whatweb() {
     local url
     url=$(prompt_value "Enter URL")
     [[ -z "$url" ]] && { log_warn "URL is required."; return 0; }
-    log_step "Running WhatWeb on ${url}"
-    whatweb "$url"
+    run_logged "WhatWeb: ${url}" whatweb "$url"
 }
 
 # --- menu -------------------------------------------------------------------

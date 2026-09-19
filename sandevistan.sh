@@ -21,6 +21,10 @@ source "${SANDEVISTAN_ROOT}/lib/core.sh"
 source "${SANDEVISTAN_ROOT}/lib/ui.sh"
 # shellcheck source=lib/installer.sh
 source "${SANDEVISTAN_ROOT}/lib/installer.sh"
+# shellcheck source=lib/logger.sh
+source "${SANDEVISTAN_ROOT}/lib/logger.sh"
+# shellcheck source=lib/session.sh
+source "${SANDEVISTAN_ROOT}/lib/session.sh"
 
 # Load all modules.
 for module in "${SANDEVISTAN_ROOT}"/lib/modules/*.sh; do
@@ -33,40 +37,40 @@ unset module
 handle_selection() {
     case "${1:-}" in
         1)
-            log_step "Initializing NETWORK RECONNAISSANCE..."
+            log_play "Network reconnaissance"
             sleep 1
             recon_menu
             ;;
         2)
-            log_step "Launching VULNERABILITY SCANNER..."
+            log_play "Vulnerability scanning"
             sleep 1
             vulnerability_menu
             ;;
         3)
-            log_step "Loading EXPLOITATION FRAMEWORK..."
+            log_play "Exploitation"
             sleep 1
             exploitation_menu
             ;;
         4)
-            log_step "Activating POST-EXPLOITATION modules..."
+            log_play "Post-exploitation"
             sleep 1
             postexploitation_menu
             ;;
         5)
-            log_step "Starting CREDENTIAL HARVESTER..."
+            log_play "Credential harvesting"
             sleep 1
             credential_menu
             ;;
         6)
-            log_step "Loading PAYLOAD GENERATOR..."
+            log_play "Payload generation"
             sleep 1
             payload_menu
             ;;
         7)
             log_step "SYSTEM SHUTDOWN"
             log_info "Closing connection..."
-            sleep 1
-            clear
+            log_recap
+            log_info "Engagement saved to: $(session_dir)"
             exit 0
             ;;
         *)
@@ -79,6 +83,7 @@ handle_selection() {
 
 main_loop() {
     clear
+    session_init "engagement"
     while true; do
         display_ascii_info
         display_main_menu
