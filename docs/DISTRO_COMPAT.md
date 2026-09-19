@@ -49,5 +49,5 @@ expected for a pentest tool you launch yourself, but worth knowing.
 | `PENTEST_BOX_IMAGE` | `debian:stable-slim` | base image (e.g. `kalilinux/kali-rolling`) |
 | `PENTEST_ENGAGEMENTS_DIR` | `~/pentest-engagements` | host directory for results |
 
-Set `SANDEVISTAN_IN_BOX=1` to force native execution (used automatically inside
+Set `PENTEST_IN_BOX=1` to force native execution (used automatically inside
 the box to avoid re-entering it).

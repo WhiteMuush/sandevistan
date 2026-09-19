@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # lib/compat.sh - Host compatibility gate.
 #
-# The security tools SANDEVISTAN wraps target the Debian/Kali family (apt, and
+# The security tools this toolkit wraps target the Debian/Kali family (apt, and
 # packages that only exist in Debian/Kali repos). On any other distro this
 # module offers to run the toolkit inside a single, shared, lightweight Debian
 # container instead of failing tool by tool. The same container (name and
@@ -10,10 +10,10 @@
 #
 # Source-only file. Do not execute directly.
 
-if [[ -n "${SANDEVISTAN_COMPAT_LOADED:-}" ]]; then
+if [[ -n "${PENTEST_COMPAT_LOADED:-}" ]]; then
     return 0
 fi
-SANDEVISTAN_COMPAT_LOADED=1
+PENTEST_COMPAT_LOADED=1
 
 # Shared box defaults. Override via the environment to point several toolkits
 # at the same box, or to pick a heavier image (e.g. kalilinux/kali-rolling).
