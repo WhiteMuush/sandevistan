@@ -21,6 +21,8 @@ source "${SANDEVISTAN_ROOT}/lib/core.sh"
 source "${SANDEVISTAN_ROOT}/lib/ui.sh"
 # shellcheck source=lib/installer.sh
 source "${SANDEVISTAN_ROOT}/lib/installer.sh"
+# shellcheck source=lib/logger.sh
+source "${SANDEVISTAN_ROOT}/lib/logger.sh"
 # shellcheck source=lib/session.sh
 source "${SANDEVISTAN_ROOT}/lib/session.sh"
 
