@@ -70,8 +70,13 @@ ID_LIKE="fedora"')"
     run _box_exec_args pentest-toolbox /opt/toolkits/sandevistan/sandevistan.sh
     [[ "$output" == *"exec"* ]]
     [[ "$output" == *"-it"* ]]
-    [[ "$output" == *"SANDEVISTAN_IN_BOX=1"* ]]
-    [[ "$output" == *"SANDEVISTAN_WORKSPACE_ROOT=/root/pentest-engagements"* ]]
+    [[ "$output" == *"PENTEST_IN_BOX=1"* ]]
+    [[ "$output" == *"PENTEST_ENGAGEMENTS=/root/pentest-engagements"* ]]
     [[ "$output" == *"pentest-toolbox"* ]]
     [[ "$output" == *"/opt/toolkits/sandevistan/sandevistan.sh"* ]]
+}
+
+@test "enter_box uses the given entry script for the inner path" {
+    run _box_exec_args pentest-toolbox /opt/toolkits/ghostline/ghostline.sh
+    [[ "$output" == *"/opt/toolkits/ghostline/ghostline.sh"* ]]
 }

@@ -69,10 +69,12 @@ _box_create_args() {
 }
 
 # _box_exec_args <name> <inner_script>
-# Args to run a toolkit inside the already-running box.
+# Args to run a toolkit inside the already-running box. PENTEST_IN_BOX marks
+# the nested run so the gate does not recurse; PENTEST_ENGAGEMENTS points every
+# toolkit's output at the host-mounted directory.
 _box_exec_args() {
     local name="$1" inner_script="$2"
-    printf 'exec -it -e SANDEVISTAN_IN_BOX=1 -e SANDEVISTAN_WORKSPACE_ROOT=/root/pentest-engagements %s bash %s' \
+    printf 'exec -it -e PENTEST_IN_BOX=1 -e PENTEST_ENGAGEMENTS=/root/pentest-engagements %s bash %s' \
         "$name" "$inner_script"
 }
 
@@ -125,10 +127,10 @@ _box_ensure() {
     _box_seed "$rt" "$name"
 }
 
-# enter_box <toolkit_dir>
+# enter_box <toolkit_dir> <entry_script>
 # Launch this toolkit inside the shared Debian box, creating it if needed.
 enter_box() {
-    local toolkit_dir="$1"
+    local toolkit_dir="$1" entry_script="${2:-run.sh}"
     local rt; rt="$(container_runtime)"
     if [[ "$rt" == "none" ]]; then
         log_error "No container runtime found. Install podman (recommended) or docker, then retry."
@@ -138,7 +140,7 @@ enter_box() {
     local toolkits_dir toolkit_name inner
     toolkits_dir="$(cd "$(dirname "$toolkit_dir")" && pwd -P)"
     toolkit_name="$(basename "$toolkit_dir")"
-    inner="/opt/toolkits/${toolkit_name}/sandevistan.sh"
+    inner="/opt/toolkits/${toolkit_name}/${entry_script}"
 
     _box_ensure "$rt" "$PENTEST_BOX_NAME" "$toolkits_dir" "$PENTEST_ENGAGEMENTS_DIR" || return 1
 
@@ -149,19 +151,20 @@ enter_box() {
     exec "$rt" $args
 }
 
-# compat_gate <toolkit_dir>
+# compat_gate <toolkit_dir> <entry_script> [toolkit_label]
 # Called once at startup. Returns 0 to run natively; otherwise offers the box
 # and, on acceptance, replaces the process with the containerised run.
 compat_gate() {
-    local toolkit_dir="$1"
+    local toolkit_dir="$1" entry_script="${2:-run.sh}"
+    local label="${3:-$(basename "$toolkit_dir")}"
 
     # Already inside the box, or on a supported host: run natively.
-    [[ -n "${SANDEVISTAN_IN_BOX:-}" ]] && return 0
+    [[ -n "${PENTEST_IN_BOX:-}" ]] && return 0
     host_is_supported && return 0
 
     local family; family="$(detect_distro_family)"
     log_warn "Your distro (${family}) is not a Debian/Kali family, which these tools target."
-    log_info "SANDEVISTAN can run inside a shared lightweight Debian box (${PENTEST_BOX_IMAGE})."
+    log_info "${label} can run inside a shared lightweight Debian box (${PENTEST_BOX_IMAGE})."
     if [[ "$(container_runtime)" == "none" ]]; then
         log_error "No container runtime found. Install podman or docker to use this, or run on a Debian-based host."
         if ! prompt_yesno "Continue natively anyway (many tools will fail to install)?"; then
@@ -169,8 +172,8 @@ compat_gate() {
         fi
         return 0
     fi
-    if prompt_yesno "Run SANDEVISTAN in the shared Debian box now?"; then
-        enter_box "$toolkit_dir"   # replaces the process on success
+    if prompt_yesno "Run ${label} in the shared Debian box now?"; then
+        enter_box "$toolkit_dir" "$entry_script"   # replaces the process on success
         log_error "Could not enter the box; continuing natively."
     fi
     return 0
