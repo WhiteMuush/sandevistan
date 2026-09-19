@@ -26,7 +26,7 @@ recon_run_masscan() {
 
 recon_run_recon_ng() {
     ensure_command "recon-ng" "install_apt recon-ng" || return 0
-    log_task "Recon-ng (interactive)"
+    log_step "Recon-ng (interactive)"
     recon-ng
 }
 

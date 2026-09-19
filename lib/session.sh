@@ -58,8 +58,7 @@ session_init() {
     : > "${SANDEVISTAN_LOG_FILE}"
     export SANDEVISTAN_WORKSPACE SANDEVISTAN_LOG_FILE
 
-    _log_reset_stats
-    _log_line "session start: ${name} (${SANDEVISTAN_WORKSPACE})"
+    _log_to_file "SESSION" "start: ${name} (${SANDEVISTAN_WORKSPACE})"
 }
 
 session_dir() {
@@ -80,13 +79,13 @@ session_output_file() {
 
 # --- run wrapper ------------------------------------------------------------
 
-# run_logged <task name> <command...>
-# Prints a TASK header, runs the command (capturing its output into the
-# workspace when one is active), records ok/failed and returns the command's
-# own exit code. Use it for non-interactive tools; leave REPL/TUI tools alone.
+# run_logged <name> <command...>
+# Logs the run, executes the command (capturing its output into the workspace
+# when one is active), logs the outcome and returns the command's own exit
+# code. Use it for non-interactive tools; leave REPL/TUI tools alone.
 run_logged() {
     local name="$1"; shift
-    log_task "${name}"
+    log_step "run: ${name}"
 
     local out_file rc
     out_file="$(session_output_file "${name}")"
@@ -99,9 +98,9 @@ run_logged() {
     fi
 
     if (( rc == 0 )); then
-        log_ok "${name}"
+        log_success "done: ${name}"
     else
-        log_failed "${name} (exit ${rc})"
+        log_error "failed: ${name} (exit ${rc})"
     fi
     return "${rc}"
 }

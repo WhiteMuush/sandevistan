@@ -9,7 +9,7 @@ fi
 SANDEVISTAN_CORE_LOADED=1
 
 # Project metadata.
-readonly SANDEVISTAN_VERSION="2.2.0"
+readonly SANDEVISTAN_VERSION="2.3.0"
 readonly SANDEVISTAN_AUTHOR="Melvin PETIT (WhiteMuush)"
 readonly SANDEVISTAN_REPO="https://github.com/WhiteMuush/sandevistan"
 

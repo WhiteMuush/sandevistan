@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
-# tests/logger.bats - lib/logger.sh: Ansible-style states, counters, recap and
-# the colour-free file mirror. No workspace/filesystem concern here.
+# tests/logger.bats - lib/logger.sh: plain timestamped logging with a
+# colour-free mirror to the session log file. No Ansible play/task/recap.
 
 load 'test_helper'
 
@@ -8,52 +8,45 @@ setup() {
     load_libs
     source "${SANDEVISTAN_ROOT}/lib/logger.sh"
     unset SANDEVISTAN_LOG_FILE
-    _log_reset_stats
 }
 
-@test "strip_ansi: removes color escape sequences" {
-    local colored plain
-    colored="$(printf '\033[32mok\033[0m')"
-    plain="$(_strip_ansi "${colored}")"
-    [ "${plain}" = "ok" ]
-}
-
-@test "log_ok increments the ok counter" {
-    log_ok "did a thing" >/dev/null
-    [ "${SANDEVISTAN_STAT_OK}" -eq 1 ]
-}
-
-@test "log_failed increments the failed counter" {
-    log_failed "broke" >/dev/null
-    [ "${SANDEVISTAN_STAT_FAILED}" -eq 1 ]
-}
-
-@test "log_changed and log_skipped increment their counters" {
-    log_changed "installed" >/dev/null
-    log_skipped "already there" >/dev/null
-    [ "${SANDEVISTAN_STAT_CHANGED}" -eq 1 ]
-    [ "${SANDEVISTAN_STAT_SKIPPED}" -eq 1 ]
-}
-
-@test "recap: reports the accumulated counts in Ansible format" {
-    log_ok "a" >/dev/null
-    log_ok "b" >/dev/null
-    log_failed "c" >/dev/null
-    run log_recap
+@test "log_info: prints an ISO timestamp, a level tag and the message" {
+    run log_info "scanning target"
     [ "$status" -eq 0 ]
-    [[ "$output" == *"ok=2"* ]]
-    [[ "$output" == *"failed=1"* ]]
-    [[ "$output" == *"changed=0"* ]]
-    [[ "$output" == *"PLAY RECAP"* ]]
+    [[ "$output" =~ ^\[[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z\] ]]
+    [[ "$output" == *"[INFO]"* ]]
+    [[ "$output" == *"scanning target"* ]]
 }
 
-@test "file mirror: state lines are written without ANSI and with a timestamp" {
-    local logfile
-    logfile="$(mktemp)"
+@test "log_success and log_error use OK and ERROR levels" {
+    run log_success "done"
+    [[ "$output" == *"[OK]"* ]]
+    run log_error "boom"
+    [[ "$output" == *"[ERROR]"* ]]
+}
+
+@test "log_warn and log_error write to stderr" {
+    run --separate-stderr log_warn "careful"
+    [ -z "$output" ]
+    [[ "$stderr" == *"[WARN]"* ]]
+}
+
+@test "file mirror: colour-free, timestamped line when a session log is open" {
+    local logfile; logfile="$(mktemp)"
     export SANDEVISTAN_LOG_FILE="${logfile}"
-    log_ok "plain message" >/dev/null
-    grep -q "ok: plain message" "${logfile}"
+    log_info "written to file" >/dev/null
+    grep -qE '^\[[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:]+Z\] \[INFO\] written to file' "${logfile}"
     ! grep -q $'\033' "${logfile}"
-    grep -qE '^\[[0-9]{4}-[0-9]{2}-[0-9]{2}T' "${logfile}"
     rm -f "${logfile}"
+}
+
+@test "no session log means no file write and no error" {
+    run log_info "just console"
+    [ "$status" -eq 0 ]
+}
+
+@test "the Ansible play/task/recap vocabulary is gone" {
+    ! declare -F log_play
+    ! declare -F log_task
+    ! declare -F log_recap
 }

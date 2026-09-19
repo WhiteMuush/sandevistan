@@ -46,13 +46,13 @@ recon_run_feroxbuster() {
 }
 ```
 
-`run_logged "<task name>" <command...>` (from `lib/session.sh`) prints an
-Ansible-style `TASK` header, captures the tool's output into the engagement
-workspace under `output/`, records an `ok`/`failed` state for the final
-`PLAY RECAP`, and returns the command's own exit code. Use it for every
-non-interactive tool. For a REPL or full-screen tool (metasploit, recon-ng),
-call `log_task "<name>"` first and then run the tool directly, so it still
-appears in the log without its output being piped through `tee`.
+`run_logged "<name>" <command...>` (from `lib/session.sh`) logs the run with a
+timestamp, captures the tool's output into the engagement workspace under
+`output/`, logs the `done`/`failed` outcome, and returns the command's own exit
+code. Use it for every non-interactive tool. For a REPL or full-screen tool
+(metasploit, recon-ng), call `log_step "<name>"` first and then run the tool
+directly, so it still appears in the log without its output being piped through
+`tee`.
 
 You can chain installers if needed:
 

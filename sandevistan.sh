@@ -39,39 +39,38 @@ unset module
 handle_selection() {
     case "${1:-}" in
         1)
-            log_play "Network reconnaissance"
+            log_step "Network reconnaissance"
             sleep 1
             recon_menu
             ;;
         2)
-            log_play "Vulnerability scanning"
+            log_step "Vulnerability scanning"
             sleep 1
             vulnerability_menu
             ;;
         3)
-            log_play "Exploitation"
+            log_step "Exploitation"
             sleep 1
             exploitation_menu
             ;;
         4)
-            log_play "Post-exploitation"
+            log_step "Post-exploitation"
             sleep 1
             postexploitation_menu
             ;;
         5)
-            log_play "Credential harvesting"
+            log_step "Credential harvesting"
             sleep 1
             credential_menu
             ;;
         6)
-            log_play "Payload generation"
+            log_step "Payload generation"
             sleep 1
             payload_menu
             ;;
         7)
             log_step "SYSTEM SHUTDOWN"
             log_info "Closing connection..."
-            log_recap
             log_info "Engagement saved to: $(session_dir)"
             exit 0
             ;;
