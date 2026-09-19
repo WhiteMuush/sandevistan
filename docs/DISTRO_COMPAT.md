@@ -45,7 +45,8 @@ expected for a pentest tool you launch yourself, but worth knowing.
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `PENTEST_BOX_NAME` | `pentest-toolbox` | shared container name |
+| `PENTEST_BOX_NAME` | `pentest-toolbox` | force a specific box name (highest priority) |
+| `PENTEST_BOX_DEDICATED` | unset | when set, give each toolkit its own box (`pentest-<toolkit>`) instead of the shared one |
 | `PENTEST_BOX_IMAGE` | `debian:stable-slim` | base image (e.g. `kalilinux/kali-rolling`) |
 | `PENTEST_ENGAGEMENTS_DIR` | `~/pentest-engagements` | host directory for results |
 

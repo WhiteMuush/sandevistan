@@ -66,6 +66,23 @@ ID_LIKE="fedora"')"
     [[ "$output" == *"sleep infinity"* ]]
 }
 
+@test "box_name: shared by default" {
+    unset PENTEST_BOX_NAME PENTEST_BOX_DEDICATED
+    [ "$(_box_name SANDEVISTAN)" = "pentest-toolbox" ]
+}
+
+@test "box_name: dedicated gives one box per toolkit" {
+    unset PENTEST_BOX_NAME
+    export PENTEST_BOX_DEDICATED=1
+    [ "$(_box_name SANDEVISTAN)" = "pentest-sandevistan" ]
+    [ "$(_box_name Ghostline)" = "pentest-ghostline" ]
+}
+
+@test "box_name: an explicit PENTEST_BOX_NAME wins over everything" {
+    export PENTEST_BOX_NAME=custom-box PENTEST_BOX_DEDICATED=1
+    [ "$(_box_name SANDEVISTAN)" = "custom-box" ]
+}
+
 @test "box exec args: interactive, marker env, workspace override, inner script" {
     run _box_exec_args pentest-toolbox /opt/toolkits/sandevistan/sandevistan.sh
     [[ "$output" == *"exec"* ]]

@@ -15,11 +15,27 @@ if [[ -n "${PENTEST_COMPAT_LOADED:-}" ]]; then
 fi
 PENTEST_COMPAT_LOADED=1
 
-# Shared box defaults. Override via the environment to point several toolkits
-# at the same box, or to pick a heavier image (e.g. kalilinux/kali-rolling).
-: "${PENTEST_BOX_NAME:=pentest-toolbox}"
+# Box configuration. By default every toolkit shares one box so a machine
+# never accumulates dozens of them. Two overrides let the user decide:
+#   PENTEST_BOX_NAME=<name>   force a specific box name (highest priority)
+#   PENTEST_BOX_DEDICATED=1   give each toolkit its own box (pentest-<toolkit>)
 : "${PENTEST_BOX_IMAGE:=debian:stable-slim}"
 : "${PENTEST_ENGAGEMENTS_DIR:=${HOME}/pentest-engagements}"
+
+# Resolve the effective box name for a toolkit label.
+_box_name() {
+    local label="$1"
+    if [[ -n "${PENTEST_BOX_NAME:-}" ]]; then
+        printf '%s' "${PENTEST_BOX_NAME}"
+    elif [[ -n "${PENTEST_BOX_DEDICATED:-}" ]]; then
+        local slug="${label,,}"
+        slug="$(printf '%s' "${slug}" | tr -cs 'a-z0-9' '-')"
+        slug="${slug#-}"; slug="${slug%-}"
+        printf 'pentest-%s' "${slug:-toolkit}"
+    else
+        printf 'pentest-toolbox'
+    fi
+}
 
 # --- detection --------------------------------------------------------------
 
@@ -130,23 +146,24 @@ _box_ensure() {
 # enter_box <toolkit_dir> <entry_script>
 # Launch this toolkit inside the shared Debian box, creating it if needed.
 enter_box() {
-    local toolkit_dir="$1" entry_script="${2:-run.sh}"
+    local toolkit_dir="$1" entry_script="${2:-run.sh}" label="${3:-}"
     local rt; rt="$(container_runtime)"
     if [[ "$rt" == "none" ]]; then
         log_error "No container runtime found. Install podman (recommended) or docker, then retry."
         return 1
     fi
 
-    local toolkits_dir toolkit_name inner
+    local toolkits_dir toolkit_name inner box
     toolkits_dir="$(cd "$(dirname "$toolkit_dir")" && pwd -P)"
     toolkit_name="$(basename "$toolkit_dir")"
     inner="/opt/toolkits/${toolkit_name}/${entry_script}"
+    box="$(_box_name "${label:-$toolkit_name}")"
 
-    _box_ensure "$rt" "$PENTEST_BOX_NAME" "$toolkits_dir" "$PENTEST_ENGAGEMENTS_DIR" || return 1
+    _box_ensure "$rt" "$box" "$toolkits_dir" "$PENTEST_ENGAGEMENTS_DIR" || return 1
 
-    log_success "Entering '${PENTEST_BOX_NAME}' (${rt}). Results persist in ${PENTEST_ENGAGEMENTS_DIR}."
+    log_success "Entering '${box}' (${rt}). Results persist in ${PENTEST_ENGAGEMENTS_DIR}."
     local args
-    args="$(_box_exec_args "$PENTEST_BOX_NAME" "$inner")"
+    args="$(_box_exec_args "$box" "$inner")"
     # shellcheck disable=SC2086
     exec "$rt" $args
 }
@@ -173,7 +190,7 @@ compat_gate() {
         return 0
     fi
     if prompt_yesno "Run ${label} in the shared Debian box now?"; then
-        enter_box "$toolkit_dir" "$entry_script"   # replaces the process on success
+        enter_box "$toolkit_dir" "$entry_script" "$label"   # replaces the process on success
         log_error "Could not enter the box; continuing natively."
     fi
     return 0
