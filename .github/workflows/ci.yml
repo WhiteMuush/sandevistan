@@ -56,11 +56,13 @@ jobs:
             source ./lib/core.sh
             source ./lib/ui.sh
             source ./lib/installer.sh
+            source ./lib/session.sh
             for m in ./lib/modules/*.sh; do source "$m"; done
             # Sanity-check that the expected functions exist.
             for fn in recon_menu vulnerability_menu exploitation_menu \
                       postexploitation_menu credential_menu payload_menu \
-                      ensure_command ensure_repo prompt_yesno; do
+                      ensure_command ensure_repo prompt_yesno \
+                      session_init log_play log_task log_recap run_logged; do
               declare -F "$fn" >/dev/null || { echo "missing: $fn"; exit 1; }
             done
             echo "All modules sourced and functions registered."

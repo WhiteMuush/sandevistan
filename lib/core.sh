@@ -25,16 +25,18 @@ if [[ -t 1 ]] && command -v tput >/dev/null 2>&1; then
     BOLD="$(tput bold)"
     RED="$(tput setaf 1)"
     GREEN="$(tput setaf 2)"
+    YELLOW="$(tput setaf 3)"
     BLUE="$(tput setaf 6)"
+    CYAN="$(tput setaf 6)"
     GRAY="$(tput setaf 8)"
     BRIGHT_RED="${BOLD}$(tput setaf 1)"
     BRIGHT_GREEN="${BOLD}$(tput setaf 2)"
     BRIGHT_BLUE="${BOLD}$(tput setaf 6)"
 else
-    RESET=""; BOLD=""; RED=""; GREEN=""; BLUE=""; GRAY=""
+    RESET=""; BOLD=""; RED=""; GREEN=""; YELLOW=""; BLUE=""; CYAN=""; GRAY=""
     BRIGHT_RED=""; BRIGHT_GREEN=""; BRIGHT_BLUE=""
 fi
-export RESET BOLD RED GREEN BLUE GRAY BRIGHT_RED BRIGHT_GREEN BRIGHT_BLUE
+export RESET BOLD RED GREEN YELLOW BLUE CYAN GRAY BRIGHT_RED BRIGHT_GREEN BRIGHT_BLUE
 
 # Cached username for the prompt; computed once.
 SANDEVISTAN_USER="$(whoami)"
