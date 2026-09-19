@@ -14,7 +14,7 @@ sandevistan.sh             ── thin entry point: sources the lib and starts t
     ├── ui.sh              ── ASCII art, banners, menu rendering helpers
     ├── installer.sh       ── prompts, logging, install/run helpers
     ├── compat.sh          ── host distro gate + shared Debian container bootstrap
-    ├── logger.sh          ── Ansible-style run logging: TASK/PLAY, states, recap
+    ├── logger.sh          ── plain timestamped logging + session-file mirror
     ├── session.sh         ── engagement workspace (loot/output/logs) + run_logged
     └── modules/
         ├── recon.sh

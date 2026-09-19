@@ -11,7 +11,6 @@ setup() {
     WS_ROOT="$(mktemp -d)"
     export SANDEVISTAN_WORKSPACE_ROOT="${WS_ROOT}"
     unset SANDEVISTAN_WORKSPACE SANDEVISTAN_LOG_FILE
-    _log_reset_stats
 }
 
 teardown() {
@@ -50,15 +49,9 @@ teardown() {
     [[ "${SANDEVISTAN_WORKSPACE}" == "${WS_ROOT}/engagement-"* ]]
 }
 
-@test "session_init: resets the run counters" {
-    SANDEVISTAN_STAT_OK=5
-    session_init "reset-test"
-    [ "${SANDEVISTAN_STAT_OK}" -eq 0 ]
-}
-
 @test "file log: session_init writes a colour-free, timestamped start line" {
     session_init "log-test"
-    grep -q "session start: log-test" "${SANDEVISTAN_LOG_FILE}"
+    grep -q "\[SESSION\] start: log-test" "${SANDEVISTAN_LOG_FILE}"
     grep -qE '^\[[0-9]{4}-[0-9]{2}-[0-9]{2}T' "${SANDEVISTAN_LOG_FILE}"
 }
 
@@ -70,22 +63,18 @@ teardown() {
     [[ "$output" == "${SANDEVISTAN_WORKSPACE}/output/nmap-scan"* ]]
 }
 
-@test "run_logged: success records ok and returns 0" {
+@test "run_logged: success returns 0 and logs the outcome" {
     session_init "run-ok"
     run run_logged "true task" true
     [ "$status" -eq 0 ]
-    _log_reset_stats
-    run_logged "true task" true >/dev/null
-    [ "${SANDEVISTAN_STAT_OK}" -eq 1 ]
+    grep -q "done: true task" "${SANDEVISTAN_LOG_FILE}"
 }
 
-@test "run_logged: failure records failed and preserves the exit code" {
+@test "run_logged: failure preserves the exit code and logs the failure" {
     session_init "run-fail"
     run run_logged "false task" bash -c 'exit 3'
     [ "$status" -eq 3 ]
-    _log_reset_stats
-    run_logged "false task" bash -c 'exit 3' >/dev/null || true
-    [ "${SANDEVISTAN_STAT_FAILED}" -eq 1 ]
+    grep -q "failed: false task (exit 3)" "${SANDEVISTAN_LOG_FILE}"
 }
 
 @test "run_logged: captures command output into the workspace" {

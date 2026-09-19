@@ -64,7 +64,7 @@ jobs:
             for fn in recon_menu vulnerability_menu exploitation_menu \
                       postexploitation_menu credential_menu payload_menu \
                       ensure_command ensure_repo prompt_yesno \
-                      log_play log_task log_recap _log_reset_stats \
+                      log_step log_info log_success log_warn log_error \
                       session_init session_output_file run_logged \
                       detect_distro_family host_is_supported \
                       container_runtime compat_gate; do
