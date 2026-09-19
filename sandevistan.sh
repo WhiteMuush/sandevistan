@@ -21,6 +21,8 @@ source "${SANDEVISTAN_ROOT}/lib/core.sh"
 source "${SANDEVISTAN_ROOT}/lib/ui.sh"
 # shellcheck source=lib/installer.sh
 source "${SANDEVISTAN_ROOT}/lib/installer.sh"
+# shellcheck source=lib/compat.sh
+source "${SANDEVISTAN_ROOT}/lib/compat.sh"
 # shellcheck source=lib/logger.sh
 source "${SANDEVISTAN_ROOT}/lib/logger.sh"
 # shellcheck source=lib/session.sh
@@ -96,5 +98,8 @@ main_loop() {
 
 # Only run the loop when executed directly (not when sourced for tests).
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    # On a non-Debian host, offer to run inside the shared Debian box. This may
+    # replace the current process with the containerised run and never return.
+    compat_gate "${SANDEVISTAN_ROOT}" sandevistan.sh SANDEVISTAN
     main_loop
 fi
