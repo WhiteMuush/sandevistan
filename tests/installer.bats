@@ -65,3 +65,80 @@ setup() {
     run ensure_command sandevistan_definitely_missing_bin "false" <<< "no"
     [ "$status" -eq 1 ]
 }
+
+# --- screen_reset + install clear -------------------------------------------
+
+@test "screen_reset: no-op (returns 0) when stdout is not a terminal" {
+    run screen_reset
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
+}
+
+@test "ensure_command: clears the screen after a successful install" {
+    local bindir marker
+    bindir="$(mktemp -d)"
+    marker="${bindir}/cleared"
+    PATH="${bindir}:${PATH}"
+
+    # Override the terminal clear with an observable marker, and make the
+    # install callback drop a working binary onto PATH.
+    screen_reset() { : > "${marker}"; }
+    _fake_install() {
+        printf '#!/bin/sh\nexit 0\n' > "${bindir}/sandevistan_fake_tool"
+        chmod +x "${bindir}/sandevistan_fake_tool"
+    }
+
+    run ensure_command sandevistan_fake_tool "_fake_install" <<< "yes"
+    [ "$status" -eq 0 ]
+    [ -f "${marker}" ]
+
+    rm -rf "${bindir}"
+}
+
+# --- has_raw_socket ---------------------------------------------------------
+
+@test "has_raw_socket: returns non-zero when no probe interpreter is present" {
+    # Point PATH at an empty dir so neither python3 nor perl resolves; the
+    # probe then has no way to open a socket and must report 'no raw'. Only
+    # shell builtins run here, so an empty PATH is safe.
+    local emptydir saved
+    emptydir="$(mktemp -d)"
+    saved="$PATH"
+    PATH="$emptydir"
+    run has_raw_socket
+    PATH="$saved"
+    rm -rf "$emptydir"
+    [ "$status" -ne 0 ]
+}
+
+# --- require_raw_socket ------------------------------------------------------
+
+@test "require_raw_socket: returns 0 when a raw socket is available" {
+    has_raw_socket() { return 0; }
+    run require_raw_socket "masscan"
+    [ "$status" -eq 0 ]
+}
+
+@test "require_raw_socket: returns non-zero with guidance when raw is missing" {
+    has_raw_socket() { return 1; }
+    run require_raw_socket "masscan"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"raw socket"* ]]
+}
+
+@test "ensure_command: redraw of the header is terminal-gated (skipped when piped)" {
+    local bindir marker
+    bindir="$(mktemp -d)"
+    marker="${bindir}/redrawn"
+    PATH="${bindir}:${PATH}"
+    screen_reset() { :; }
+    display_ascii_info() { : > "${marker}"; }
+    _fake_install() {
+        printf '#!/bin/sh\nexit 0\n' > "${bindir}/sandevistan_fake_tool2"
+        chmod +x "${bindir}/sandevistan_fake_tool2"
+    }
+    run ensure_command sandevistan_fake_tool2 "_fake_install" <<< "yes"
+    [ "$status" -eq 0 ]
+    [ ! -f "${marker}" ]
+    rm -rf "${bindir}"
+}

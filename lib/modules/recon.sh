@@ -13,11 +13,22 @@ recon_run_nmap() {
     local target
     target=$(prompt_value "Enter target (IP/hostname)")
     [[ -z "$target" ]] && { log_warn "Target is required."; return 0; }
-    run_logged "Nmap: ${target}" nmap "$target"
+    # As root, nmap defaults to a SYN scan, which needs a raw socket. That
+    # fails in a rootless podman box (raw sockets denied over host net), so
+    # fall back to an unprivileged TCP connect scan when no raw socket exists.
+    local -a extra=()
+    if ! has_raw_socket; then
+        log_info "No raw-socket capability; using unprivileged TCP connect scan."
+        extra=(--unprivileged)
+    fi
+    run_logged "Nmap: ${target}" nmap "${extra[@]}" "$target"
 }
 
 recon_run_masscan() {
     ensure_command "masscan" "install_apt masscan" || return 0
+    # masscan uses its own raw-socket IP stack and has no connect-scan mode,
+    # so it cannot degrade like nmap: guard instead of crashing.
+    require_raw_socket "masscan" || return 0
     local target ports
     target=$(prompt_value "Enter target (IP/range)")
     ports=$(prompt_value "Enter ports" "1-1000")
