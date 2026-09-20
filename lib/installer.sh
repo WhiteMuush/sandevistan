@@ -63,6 +63,64 @@ maybe_sudo() {
 }
 
 # ---------------------------------------------------------------------------
+# Terminal helpers
+# ---------------------------------------------------------------------------
+
+# Clear the screen so verbose install output does not clutter the next prompt.
+# Uses ANSI escapes (no ncurses/`clear` binary needed inside slim boxes) and is
+# a no-op when stdout is not a terminal, so it never pollutes pipes or the
+# session log.
+screen_reset() {
+    [[ -t 1 ]] || return 0
+    printf '\033[H\033[2J\033[3J'
+}
+
+# ---------------------------------------------------------------------------
+# Capability probes
+# ---------------------------------------------------------------------------
+
+# has_raw_socket
+# Returns 0 only when a raw socket can actually be opened (so nmap SYN scans,
+# OS detection, etc. work). Returns non-zero otherwise: an unprivileged user,
+# or a rootless podman box where CAP_NET_RAW shows up in CapEff yet stays
+# ineffective over the host network namespace. Because that CapEff bit lies in
+# the rootless case, the only reliable test is to open a socket for real; when
+# no interpreter is available to try, assume no raw (safe: connect scan works).
+has_raw_socket() {
+    if command -v python3 >/dev/null 2>&1; then
+        python3 - <<'PY' 2>/dev/null
+import socket, sys
+try:
+    socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP).close()
+except OSError:
+    sys.exit(1)
+PY
+        return
+    fi
+    if command -v perl >/dev/null 2>&1; then
+        perl -e 'use Socket; socket(my $s, AF_INET, SOCK_RAW, getprotobyname("tcp")) or exit 1;' 2>/dev/null
+        return
+    fi
+    return 1
+}
+
+# require_raw_socket <tool>
+# Guard for tools that hard-require a raw socket and cannot fall back to a
+# connect scan (masscan, hping, packet sniffers). Prints an actionable message
+# and returns non-zero when raw sockets are unavailable, so the caller skips
+# cleanly instead of crashing with "Couldn't open a raw socket".
+require_raw_socket() {
+    local tool="${1:-This tool}"
+    if has_raw_socket; then
+        return 0
+    fi
+    log_warn "${tool} needs a raw socket, which is unavailable here."
+    log_info "Rootless containers cannot open raw sockets over the host network."
+    log_info "Run it on a native host or in a rootful box, then retry."
+    return 1
+}
+
+# ---------------------------------------------------------------------------
 # Backend installers
 # ---------------------------------------------------------------------------
 
@@ -144,6 +202,12 @@ ensure_command() {
     }
 
     if command -v "$cmd" >/dev/null 2>&1; then
+        # Wipe the verbose install output, then redraw the branded header so the
+        # following prompt keeps the design instead of sitting on a naked screen.
+        screen_reset
+        if [[ -t 1 ]] && command -v display_ascii_info >/dev/null 2>&1; then
+            display_ascii_info
+        fi
         log_success "${cmd} installed successfully."
         return 0
     fi
