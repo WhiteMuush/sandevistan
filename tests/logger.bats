@@ -50,3 +50,13 @@ setup() {
     ! declare -F log_task
     ! declare -F log_recap
 }
+
+@test "log_launch: emits the step then a trailing blank line" {
+    local out
+    out="$(mktemp)"
+    log_launch "Launching Tool" >"$out" 2>&1
+    # one line for the [STEP], one blank line after it for breathing room
+    [ "$(wc -l <"$out")" -eq 2 ]
+    grep -q "Launching Tool" "$out"
+    rm -f "$out"
+}

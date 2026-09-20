@@ -33,3 +33,8 @@ log_info()    { _log INFO  "${BRIGHT_BLUE}"  1 "$*"; }
 log_warn()    { _log WARN  "${BRIGHT_RED}"   2 "$*"; }
 log_success() { _log OK    "${BRIGHT_GREEN}" 1 "$*"; }
 log_error()   { _log ERROR "${BRIGHT_RED}"   2 "$*"; }
+
+# log_launch <message>
+# Like log_step, but adds a trailing blank line so an interactive tool's own
+# banner has breathing room instead of butting up against the log line.
+log_launch()  { log_step "$*"; printf '\n'; }

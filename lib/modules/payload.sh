@@ -96,7 +96,7 @@ payload_run_veil() {
         "$dest" \
         "payload_install_veil" || return 0
 
-    log_step "Launching Veil-Evasion"
+    log_launch "Launching Veil-Evasion"
     run_in_dir "$dest" ./Veil.py
 }
 
@@ -118,7 +118,7 @@ payload_run_fatrat() {
         "$dest" \
         "payload_install_fatrat" || return 0
 
-    log_step "Launching TheFatRat"
+    log_launch "Launching TheFatRat"
     run_in_dir "$dest" ./fatrat
 }
 
