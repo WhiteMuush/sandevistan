@@ -6,7 +6,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Shellcheck](https://img.shields.io/badge/lint-shellcheck-informational.svg)](https://www.shellcheck.net/)
 
-**SANDEVISTAN** is your unified cybersecurity toolkit — a single space where
+**SANDEVISTAN** is your unified cybersecurity toolkit, a single space where
 reconnaissance, exploitation, and post-exploitation tools converge. No more
 context switching between dozens of platforms. Everything you need is here,
 optimized and ready to deploy.
@@ -30,10 +30,10 @@ chmod +x sandevistan.sh
 
 ## Features
 
-- **All-in-One Arsenal** — Comprehensive suite of security tools in one place
-- **Streamlined Workflow** — No more tool hunting; everything at your fingertips
-- **Pluggable Architecture** — Add a new tool in one focused PR (see [docs/ADDING_A_TOOL.md](docs/ADDING_A_TOOL.md))
-- **Easy Deployment** — Simple installation, sensible defaults
+- **All-in-One Arsenal**: Comprehensive suite of security tools in one place
+- **Streamlined Workflow**: No more tool hunting; everything at your fingertips
+- **Pluggable Architecture**: Add a new tool in one focused PR (see [docs/ADDING_A_TOOL.md](docs/ADDING_A_TOOL.md))
+- **Easy Deployment**: Simple installation, sensible defaults
 - **Engagement workspace**: every run opens a timestamped workspace (`loot/`, `output/`, `logs/`) and reports progress in a plain timestamped log (`[ISO-8601] [LEVEL] message`), mirrored without colour to `logs/session.log`, with each tool's output captured under `output/`
 - **Runs on any distro**: on a Debian/Kali-family host it runs natively; anywhere else (Fedora, Arch, openSUSE, atomic distros) it offers to run inside one shared, lightweight Debian box (`debian:stable-slim`) via podman or docker, reused across toolkits so it is built once. See [docs/DISTRO_COMPAT.md](docs/DISTRO_COMPAT.md)
 
@@ -95,7 +95,7 @@ export SANDEVISTAN_TOOLS_DIR=/opt/sandevistan-tools
 
 ## Contributing
 
-Pull Requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) and
+Pull Requests are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md) and
 [docs/ADDING_A_TOOL.md](docs/ADDING_A_TOOL.md). The codebase is intentionally
 small and predictable so a new tool integration is usually one focused PR.
 
@@ -110,7 +110,7 @@ PETIT / WhiteMuush).
 ## Security
 
 Found a vulnerability? Please follow the responsible-disclosure process in
-[SECURITY.md](SECURITY.md) — do **not** open a public issue.
+[SECURITY.md](SECURITY.md), do **not** open a public issue.
 
 ## Disclaimer
 

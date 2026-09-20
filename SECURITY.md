@@ -3,7 +3,7 @@
 ## Scope
 
 SANDEVISTAN is a wrapper around third-party offensive security tools. The
-project itself does not contain exploit code — it orchestrates well-known
+project itself does not contain exploit code, it orchestrates well-known
 upstream tools. Vulnerabilities in the wrapper layer (e.g., command
 injection, privilege escalation through the script, insecure download
 paths) are in scope. Vulnerabilities in the wrapped tools themselves should
