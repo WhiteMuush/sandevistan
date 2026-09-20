@@ -25,7 +25,7 @@ sandevistan.sh             ── thin entry point: sources the lib and starts t
         └── payload.sh
 ```
 
-Every file under `lib/` is **source-only** — it never runs by itself. The
+Every file under `lib/` is **source-only**, it never runs by itself. The
 entry point is the only executable script.
 
 ## Boot sequence
@@ -33,8 +33,8 @@ entry point is the only executable script.
 1. `sandevistan.sh` resolves its own directory into `SANDEVISTAN_ROOT`.
 2. It sources, in order:
    - `lib/core.sh` (palette, constants)
-   - `lib/ui.sh` (banners — depends on core)
-   - `lib/installer.sh` (helpers — depends on core)
+   - `lib/ui.sh` (banners, depends on core)
+   - `lib/installer.sh` (helpers, depends on core)
    - `lib/compat.sh` (distro gate + container bootstrap, depends on core + installer)
    - `lib/logger.sh` (run logging, depends on core)
    - `lib/session.sh` (workspace + run_logged, depends on logger)
@@ -80,7 +80,7 @@ The optional third argument runs once, right after a fresh clone.
 
 ## Logging
 
-Always use the log helpers from `lib/installer.sh` — they share a consistent
+Always use the log helpers from `lib/installer.sh`, they share a consistent
 visual style and degrade gracefully when stdout is not a TTY (no color codes
 in pipes/logs).
 
@@ -157,7 +157,7 @@ sudo apt-get install -y bats
 bats tests/
 ```
 
-The suite covers the *framework* helpers only — colour degradation and the
+The suite covers the *framework* helpers only, colour degradation and the
 load guard (`core.bats`), the prompt/`maybe_sudo`/`ensure_command` gates
 (`installer.bats`), banner and menu rendering (`ui.bats`), and the entry
 point's source-guard and dispatcher (`entrypoint.bats`). Tests must never

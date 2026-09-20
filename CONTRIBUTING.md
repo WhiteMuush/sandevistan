@@ -38,7 +38,7 @@ contribute a new tool.
 
 Requirements:
 
-- `bash` 5.x (the project targets modern Linux distros — Kali, Parrot, Ubuntu, …)
+- `bash` 5.x (the project targets modern Linux distros, Kali, Parrot, Ubuntu, …)
 - `shellcheck` for local linting
 - `bats` for running the unit suite (`apt-get install bats`)
 - `git`
@@ -71,7 +71,7 @@ All three checks are also enforced in CI.
 - **Strict-ish mode**: `set -uo pipefail` at the top of every executable
   script. We avoid `set -e` because the interactive loop must survive
   commands that exit non-zero (cancelled prompts, failed scans, …).
-- **Quoting**: always quote variable expansions — `"${var}"`, not `$var`.
+- **Quoting**: always quote variable expansions, `"${var}"`, not `$var`.
 - **Indentation**: 4 spaces, no tabs (enforced by `.editorconfig`).
 - **Naming**:
   - functions: `snake_case`
@@ -93,7 +93,7 @@ All three checks are also enforced in CI.
 - [ ] Documentation updated (README, `docs/`, in-file comments where needed)
 - [ ] No secrets, hard-coded credentials or pre-set targets committed
 
-A PR template is provided automatically by GitHub — please fill it in.
+A PR template is provided automatically by GitHub, please fill it in.
 
 ## Reporting bugs
 
@@ -106,7 +106,7 @@ Use the GitHub issue tracker with the **Bug report** template. Please include:
 
 ## Reporting security issues
 
-Do **not** open a public issue for security vulnerabilities — see
+Do **not** open a public issue for security vulnerabilities, see
 [SECURITY.md](SECURITY.md) for the disclosure process.
 
 ## License

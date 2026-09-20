@@ -9,7 +9,7 @@ file**, **one line in the main entry**, and **one section of the README**.
 
 ---
 
-## Step 1 — Pick the right module
+## Step 1: Pick the right module
 
 Find which `lib/modules/<name>.sh` your tool belongs to:
 
@@ -27,12 +27,12 @@ discuss whether a new module is warranted.
 
 ---
 
-## Step 2 — Pick the install strategy
+## Step 2: Pick the install strategy
 
 There are two installation patterns. Pick the one that matches how the
 tool's upstream distributes it:
 
-### Pattern A — binary on PATH (apt / gem / go install / brew / …)
+### Pattern A: binary on PATH (apt / gem / go install / brew / …)
 
 Use `ensure_command`:
 
@@ -60,7 +60,7 @@ You can chain installers if needed:
 ensure_command "rustscan" "install_go github.com/RustScan/RustScan/cmd/rustscan@latest" || return 0
 ```
 
-### Pattern B — git-cloned tool
+### Pattern B: git-cloned tool
 
 Use `ensure_repo`. Pass an optional post-install callback to install Python
 deps, run a build script, etc.
@@ -79,15 +79,15 @@ postexploit_run_kerbrute() {
 
 Available post-install helpers:
 
-- `install_pip_requirements "$dest"` — `pip3 install -r $dest/requirements.txt`
+- `install_pip_requirements "$dest"`: `pip3 install -r $dest/requirements.txt`
 - `install_apt pkg1 pkg2 …`
 - `install_gem gem1 gem2 …`
 - `install_go pkg@version`
-- `run_in_dir "$dest" <command>` — run something inside the clone
+- `run_in_dir "$dest" <command>`: run something inside the clone
 
 ---
 
-## Step 3 — Wire it into the menu
+## Step 3: Wire it into the menu
 
 Each module ends with a `case` dispatcher. Add your tool there and bump the
 options list at the top:
@@ -114,7 +114,7 @@ esac
 
 ---
 
-## Step 4 — Update documentation
+## Step 4: Update documentation
 
 - Add the tool to the matching section of [README.md](../README.md).
 - If the tool needs special prerequisites (e.g., a kernel module, a
@@ -122,7 +122,7 @@ esac
 
 ---
 
-## Step 5 — Validate locally
+## Step 5: Validate locally
 
 ```bash
 bash -n lib/modules/<name>.sh
@@ -144,7 +144,7 @@ install + execution paths work.
 
 ---
 
-## Step 6 — Open the PR
+## Step 6: Open the PR
 
 Use the PR template. The reviewer will check:
 
