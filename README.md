@@ -19,7 +19,7 @@ cd sandevistan && chmod +x sandevistan.sh
 ```
 
 Runs natively on Debian/Kali. On Fedora, Arch, openSUSE or an atomic distro
-(Bazzite, Silverblue) it offers a shared Debian box (podman/docker) and installs
+(Bazzite, Silverblue) it offers a per-toolkit Debian box (podman/docker) and installs
 each tool the first time you pick it. Inside that box scans fall back to an
 unprivileged connect scan automatically, so nmap never dies on a missing raw
 socket. See [docs/DISTRO_COMPAT.md](docs/DISTRO_COMPAT.md).

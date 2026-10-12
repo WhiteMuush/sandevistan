@@ -3,10 +3,10 @@
 #
 # The security tools this toolkit wraps target the Debian/Kali family (apt, and
 # packages that only exist in Debian/Kali repos). On any other distro this
-# module offers to run the toolkit inside a single, shared, lightweight Debian
-# container instead of failing tool by tool. The same container (name and
-# image are configurable) is reused by every toolkit under the same parent
-# directory, so it is built once and the tools installed in it persist.
+# module offers to run the toolkit inside a lightweight Debian container
+# instead of failing tool by tool. Each toolkit gets its own box that mounts
+# only that toolkit, so a box always runs the tree it was launched from,
+# wherever that lives on disk, and the tools installed in it persist.
 #
 # Source-only file. Do not execute directly.
 
@@ -15,26 +15,23 @@ if [[ -n "${PENTEST_COMPAT_LOADED:-}" ]]; then
 fi
 PENTEST_COMPAT_LOADED=1
 
-# Box configuration. By default every toolkit shares one box so a machine
-# never accumulates dozens of them. Two overrides let the user decide:
-#   PENTEST_BOX_NAME=<name>   force a specific box name (highest priority)
-#   PENTEST_BOX_DEDICATED=1   give each toolkit its own box (pentest-<toolkit>)
+# Box configuration. Each toolkit gets its own box (pentest-<toolkit>) that
+# mounts only that toolkit. One override:
+#   PENTEST_BOX_NAME=<name>   force a specific box name
 : "${PENTEST_BOX_IMAGE:=debian:stable-slim}"
 : "${PENTEST_ENGAGEMENTS_DIR:=${HOME}/pentest-engagements}"
 
-# Resolve the effective box name for a toolkit label.
+# Resolve the box name for a toolkit label: one box per toolkit by default.
 _box_name() {
     local label="$1"
     if [[ -n "${PENTEST_BOX_NAME:-}" ]]; then
         printf '%s' "${PENTEST_BOX_NAME}"
-    elif [[ -n "${PENTEST_BOX_DEDICATED:-}" ]]; then
-        local slug="${label,,}"
-        slug="$(printf '%s' "${slug}" | tr -cs 'a-z0-9' '-')"
-        slug="${slug#-}"; slug="${slug%-}"
-        printf 'pentest-%s' "${slug:-toolkit}"
-    else
-        printf 'pentest-toolbox'
+        return 0
     fi
+    local slug="${label,,}"
+    slug="$(printf '%s' "${slug}" | tr -cs 'a-z0-9' '-')"
+    slug="${slug#-}"; slug="${slug%-}"
+    printf 'pentest-%s' "${slug:-toolkit}"
 }
 
 # --- detection --------------------------------------------------------------
@@ -73,20 +70,20 @@ container_runtime() {
 
 # --- argument builders (pure, testable) -------------------------------------
 
-# _box_create_args <name> <image> <toolkits_dir> <engagements_dir>
-# Args to create the persistent, detached shared box. Host networking plus
-# NET_RAW/NET_ADMIN are required for real scans and raw-socket tools.
+# _box_create_args <name> <image> <toolkit_dir> <engagements_dir>
+# Args to create the persistent, detached box for one toolkit. Host networking
+# plus NET_RAW/NET_ADMIN are required for real scans and raw-socket tools.
 _box_create_args() {
-    local name="$1" image="$2" toolkits_dir="$3" engagements_dir="$4"
+    local name="$1" image="$2" toolkit_dir="$3" engagements_dir="$4"
     # The :z suffix relabels the bind mounts for SELinux hosts (Fedora, Bazzite,
     # RHEL) so a rootless container can write to them. It is a no-op elsewhere.
-    printf 'run -d --name %s --hostname %s --network host --cap-add NET_RAW --cap-add NET_ADMIN -v %s:/opt/toolkits:z -v %s:/root/pentest-engagements:z %s sleep infinity' \
-        "$name" "$name" "$toolkits_dir" "$engagements_dir" "$image"
+    printf 'run -d --name %s --hostname %s --network host --cap-add NET_RAW --cap-add NET_ADMIN -v %s:/opt/toolkit:z -v %s:/root/pentest-engagements:z %s sleep infinity' \
+        "$name" "$name" "$toolkit_dir" "$engagements_dir" "$image"
 }
 
 # _box_exec_args <name> <inner_script>
-# Args to run a toolkit inside the already-running box. PENTEST_IN_BOX marks
-# the nested run so the gate does not recurse; PENTEST_ENGAGEMENTS points every
+# Args to run the toolkit inside the already-running box. PENTEST_IN_BOX marks
+# the nested run so the gate does not recurse; PENTEST_ENGAGEMENTS points the
 # toolkit's output at the host-mounted directory.
 _box_exec_args() {
     local name="$1" inner_script="$2"
@@ -123,28 +120,44 @@ _box_seed() {
     fi
 }
 
-# Ensure the shared box exists and is running; create and seed it on first use.
+# Host path currently bind-mounted at /opt/toolkit in an existing box.
+_box_mount_src() {
+    local rt="$1" name="$2"
+    "$rt" container inspect -f \
+        '{{range .Mounts}}{{if eq .Destination "/opt/toolkit"}}{{.Source}}{{end}}{{end}}' \
+        "$name" 2>/dev/null
+}
+
+# Ensure the toolkit's box exists, runs, and mounts the right tree; create,
+# seed, or rebuild it as needed.
 _box_ensure() {
-    local rt="$1" name="$2" toolkits_dir="$3" engagements_dir="$4"
+    local rt="$1" name="$2" toolkit_dir="$3" engagements_dir="$4"
     mkdir -p "$engagements_dir"
 
     if "$rt" container inspect "$name" >/dev/null 2>&1; then
-        if [[ "$("$rt" container inspect -f '{{.State.Running}}' "$name" 2>/dev/null)" != "true" ]]; then
-            "$rt" start "$name" >/dev/null || { log_error "Could not start box '${name}'."; return 1; }
+        if [[ "$(_box_mount_src "$rt" "$name")" == "$toolkit_dir" ]]; then
+            if [[ "$("$rt" container inspect -f '{{.State.Running}}' "$name" 2>/dev/null)" != "true" ]]; then
+                "$rt" start "$name" >/dev/null || { log_error "Could not start box '${name}'."; return 1; }
+            fi
+            return 0
         fi
-        return 0
+        # Box exists but points at a different tree (repo moved, or a stale box
+        # from the old shared-mount layout): rebuild it rather than silently
+        # running the wrong code.
+        log_warn "Box '${name}' mounts a different path; rebuilding it."
+        "$rt" rm -f "$name" >/dev/null 2>&1
     fi
 
-    log_info "Creating shared Debian box '${name}' from ${PENTEST_BOX_IMAGE}..."
+    log_info "Creating Debian box '${name}' from ${PENTEST_BOX_IMAGE}..."
     local args
-    args="$(_box_create_args "$name" "$PENTEST_BOX_IMAGE" "$toolkits_dir" "$engagements_dir")"
+    args="$(_box_create_args "$name" "$PENTEST_BOX_IMAGE" "$toolkit_dir" "$engagements_dir")"
     # shellcheck disable=SC2086
     "$rt" $args >/dev/null || { log_error "Could not create the box."; return 1; }
     _box_seed "$rt" "$name"
 }
 
-# enter_box <toolkit_dir> <entry_script>
-# Launch this toolkit inside the shared Debian box, creating it if needed.
+# enter_box <toolkit_dir> <entry_script> [label]
+# Launch this toolkit inside its own Debian box, creating it if needed.
 enter_box() {
     local toolkit_dir="$1" entry_script="${2:-run.sh}" label="${3:-}"
     local rt; rt="$(container_runtime)"
@@ -153,13 +166,12 @@ enter_box() {
         return 1
     fi
 
-    local toolkits_dir toolkit_name inner box
-    toolkits_dir="$(cd "$(dirname "$toolkit_dir")" && pwd -P)"
-    toolkit_name="$(basename "$toolkit_dir")"
-    inner="/opt/toolkits/${toolkit_name}/${entry_script}"
-    box="$(_box_name "${label:-$toolkit_name}")"
+    local toolkit_abs inner box
+    toolkit_abs="$(cd "$toolkit_dir" && pwd -P)"
+    inner="/opt/toolkit/${entry_script}"
+    box="$(_box_name "${label:-$(basename "$toolkit_abs")}")"
 
-    _box_ensure "$rt" "$box" "$toolkits_dir" "$PENTEST_ENGAGEMENTS_DIR" || return 1
+    _box_ensure "$rt" "$box" "$toolkit_abs" "$PENTEST_ENGAGEMENTS_DIR" || return 1
 
     log_success "Entering '${box}' (${rt}). Results persist in ${PENTEST_ENGAGEMENTS_DIR}."
     local args
@@ -181,7 +193,7 @@ compat_gate() {
 
     local family; family="$(detect_distro_family)"
     log_warn "Your distro (${family}) is not a Debian/Kali family, which these tools target."
-    log_info "${label} can run inside a shared lightweight Debian box (${PENTEST_BOX_IMAGE})."
+    log_info "${label} can run inside a lightweight Debian box (${PENTEST_BOX_IMAGE})."
     if [[ "$(container_runtime)" == "none" ]]; then
         log_error "No container runtime found. Install podman or docker to use this, or run on a Debian-based host."
         if ! prompt_yesno "Continue natively anyway (many tools will fail to install)?"; then
@@ -189,7 +201,7 @@ compat_gate() {
         fi
         return 0
     fi
-    if prompt_yesno "Run ${label} in the shared Debian box now?"; then
+    if prompt_yesno "Run ${label} in its Debian box now?"; then
         enter_box "$toolkit_dir" "$entry_script" "$label"   # replaces the process on success
         log_error "Could not enter the box; continuing natively."
     fi

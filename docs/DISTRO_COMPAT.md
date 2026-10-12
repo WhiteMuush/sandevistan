@@ -13,13 +13,14 @@ At startup `lib/compat.sh` reads `/etc/os-release`:
   toolkit **natively**. Nothing changes.
 - **Any other distro** (Fedora, Arch, openSUSE, Alpine, atomic distros like
   Bazzite or Silverblue) is offered a container: SANDEVISTAN runs inside one
-  shared, lightweight Debian box where `apt` and the tools work as intended.
+  lightweight Debian box where `apt` and the tools work as intended.
 
-## The shared box
+## The box
 
 - Image: `debian:stable-slim` by default (small; tools are pulled on demand).
-- One persistent, named container reused by every toolkit that sits under the
-  same parent directory, so it is created once and installed tools survive.
+- One persistent box per toolkit (`pentest-<toolkit>`) that mounts only that
+  toolkit, so it always runs the tree it was launched from and installed tools
+  survive.
 - Runtime: **podman** is preferred, **docker** is the fallback.
 - On first creation the box is seeded with the essentials (`sudo`, `git`,
   `python3`, `pip`, `pipx`), and you are offered the **Kali repositories** for
@@ -27,7 +28,7 @@ At startup `lib/compat.sh` reads `/etc/os-release`:
 
 Bind mounts:
 
-- the toolkits' parent directory at `/opt/toolkits`
+- the toolkit's own directory at `/opt/toolkit`
 - an engagements directory (`~/pentest-engagements` by default) at
   `/root/pentest-engagements`, so loot and reports stay on the host
 
@@ -54,8 +55,7 @@ container.
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `PENTEST_BOX_NAME` | `pentest-toolbox` | force a specific box name (highest priority) |
-| `PENTEST_BOX_DEDICATED` | unset | when set, give each toolkit its own box (`pentest-<toolkit>`) instead of the shared one |
+| `PENTEST_BOX_NAME` | `pentest-<toolkit>` | force a specific box name |
 | `PENTEST_BOX_IMAGE` | `debian:stable-slim` | base image (e.g. `kalilinux/kali-rolling`) |
 | `PENTEST_ENGAGEMENTS_DIR` | `~/pentest-engagements` | host directory for results |
 
