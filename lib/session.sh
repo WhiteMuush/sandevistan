@@ -45,7 +45,7 @@ session_init() {
     if ! _validate_session_name "${name}"; then
         name="engagement"
     fi
-    # Inside the shared box PENTEST_ENGAGEMENTS points at the host-mounted dir.
+    # Inside the box PENTEST_ENGAGEMENTS points at the host-mounted dir.
     : "${SANDEVISTAN_WORKSPACE_ROOT:=${PENTEST_ENGAGEMENTS:-${HOME}/sandevistan-engagements}}"
 
     local ts

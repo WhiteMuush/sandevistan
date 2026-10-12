@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
-# tests/compat.bats - lib/compat.sh: host distro detection and the container
-# bootstrap argument builders. No container is ever launched here.
+# tests/compat.bats - lib/compat.sh: host distro detection and the per-toolkit
+# container bootstrap argument builders. No container is ever launched here.
 
 load 'test_helper'
 
@@ -54,46 +54,41 @@ ID_LIKE="fedora"')"
     [[ "$output" =~ ^(podman|docker|none)$ ]]
 }
 
-@test "box create args: named, host network, caps, mounts, sleep" {
-    run _box_create_args pentest-toolbox debian:stable-slim /host/toolkits /host/engagements
-    [[ "$output" == *"--name pentest-toolbox"* ]]
+@test "box create args: named, host network, caps, single toolkit mount, sleep" {
+    run _box_create_args pentest-sandevistan debian:stable-slim /host/sandevistan /host/engagements
+    [[ "$output" == *"--name pentest-sandevistan"* ]]
     [[ "$output" == *"--network host"* ]]
     [[ "$output" == *"--cap-add NET_RAW"* ]]
     [[ "$output" == *"--cap-add NET_ADMIN"* ]]
-    [[ "$output" == *"/host/toolkits:/opt/toolkits"* ]]
+    [[ "$output" == *"/host/sandevistan:/opt/toolkit"* ]]
+    [[ "$output" != *"/opt/toolkits"* ]]
     [[ "$output" == *"/host/engagements:/root/pentest-engagements"* ]]
     [[ "$output" == *"debian:stable-slim"* ]]
     [[ "$output" == *"sleep infinity"* ]]
 }
 
-@test "box_name: shared by default" {
-    unset PENTEST_BOX_NAME PENTEST_BOX_DEDICATED
-    [ "$(_box_name SANDEVISTAN)" = "pentest-toolbox" ]
-}
-
-@test "box_name: dedicated gives one box per toolkit" {
+@test "box_name: one box per toolkit by default" {
     unset PENTEST_BOX_NAME
-    export PENTEST_BOX_DEDICATED=1
     [ "$(_box_name SANDEVISTAN)" = "pentest-sandevistan" ]
     [ "$(_box_name Ghostline)" = "pentest-ghostline" ]
 }
 
 @test "box_name: an explicit PENTEST_BOX_NAME wins over everything" {
-    export PENTEST_BOX_NAME=custom-box PENTEST_BOX_DEDICATED=1
+    export PENTEST_BOX_NAME=custom-box
     [ "$(_box_name SANDEVISTAN)" = "custom-box" ]
 }
 
-@test "box exec args: interactive, marker env, workspace override, inner script" {
-    run _box_exec_args pentest-toolbox /opt/toolkits/sandevistan/sandevistan.sh
+@test "box exec args: interactive, marker env, engagements, inner script" {
+    run _box_exec_args pentest-sandevistan /opt/toolkit/sandevistan.sh
     [[ "$output" == *"exec"* ]]
     [[ "$output" == *"-it"* ]]
     [[ "$output" == *"PENTEST_IN_BOX=1"* ]]
     [[ "$output" == *"PENTEST_ENGAGEMENTS=/root/pentest-engagements"* ]]
-    [[ "$output" == *"pentest-toolbox"* ]]
-    [[ "$output" == *"/opt/toolkits/sandevistan/sandevistan.sh"* ]]
+    [[ "$output" == *"pentest-sandevistan"* ]]
+    [[ "$output" == *"/opt/toolkit/sandevistan.sh"* ]]
 }
 
 @test "enter_box uses the given entry script for the inner path" {
-    run _box_exec_args pentest-toolbox /opt/toolkits/ghostline/ghostline.sh
-    [[ "$output" == *"/opt/toolkits/ghostline/ghostline.sh"* ]]
+    run _box_exec_args pentest-sandevistan /opt/toolkit/ghostline.sh
+    [[ "$output" == *"/opt/toolkit/ghostline.sh"* ]]
 }
